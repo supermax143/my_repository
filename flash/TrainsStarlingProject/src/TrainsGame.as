@@ -15,13 +15,18 @@ package
 		public function TrainsGame()
 		{
 			var atlas:TextureAtlas = 
-				DynamicAtlas.fromMovieClipContainer(ResourceManager.instance.getMovieClip('locomotive_type4'), 1, 0, true, true);
-			trace(atlas)
-			var boy_mc:MovieClip = new MovieClip(atlas.getTextures(), 10);
-			boy_mc.x = 100;
-			boy_mc.y = 50;
-			addChild(boy_mc);
-			Starling.juggler.add(boy_mc);
+				DynamicAtlas.fromMovieClipContainer(ResourceManager.instance.getMovieClip('locomotives_container'), .4, 0, true, true);
+			for (var i:int = 0; i < 50; i++) 
+			{
+				var textureName:String = Math.random()>.5?'locomotive_type1':'locomotive_type3';
+				var boy_mc:MovieClip = new MovieClip(atlas.getTextures(textureName), 30);
+				boy_mc.fps = 60;
+				boy_mc.x = Math.random()*700;
+				boy_mc.y = Math.random()*700;
+				addChild(boy_mc);
+				Starling.juggler.add(boy_mc);
+			}
+			
 		}
 	}
 }

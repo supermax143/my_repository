@@ -4,6 +4,8 @@ package
 	import flash.net.URLVariables;
 	import flash.system.Security;
 	
+	import net.hires.debug.Stats;
+	
 	import resources.BunchLoadingItem;
 	import resources.ResourceManager;
 	import resources.ResourceManagerImpl;
@@ -22,13 +24,16 @@ package
 			ResourceManager.instance = new ResourceManagerImpl();
 			Security.loadPolicyFile("http://stcocos.com.xsph.ru/crossdomain.xml");
 			var resources:Array = [];
-			addResource(resources, "http://stcocos.com.xsph.ru/static_trains/buildings_resources.swf");
-			addResource(resources, "http://stcocos.com.xsph.ru/static_trains/environment_resources.swf");
-			addResource(resources, "http://stcocos.com.xsph.ru/static_trains/locomotive_resources.swf"); 
-			addResource(resources, "http://stcocos.com.xsph.ru/static_trains/wagon_resources.swf"); 
-			addResource(resources, "http://stcocos.com.xsph.ru/static_trains/rails_resources.swf"); 
-			addResource(resources, "http://stcocos.com.xsph.ru/static_trains/map_resources.swf"); 
+			//addResource(resources, "http://stcocos.com.xsph.ru/static_trains/buildings_resources.swf");
+			//addResource(resources, "http://stcocos.com.xsph.ru/static_trains/environment_resources.swf");
+			//addResource(resources, "http://stcocos.com.xsph.ru/static_trains/locomotive_resources.swf"); 
+			//addResource(resources, "http://stcocos.com.xsph.ru/static_trains/wagon_resources.swf"); 
+			//addResource(resources, "http://stcocos.com.xsph.ru/static_trains/rails_resources.swf"); 
+			//addResource(resources, "http://stcocos.com.xsph.ru/static_trains/map_resources.swf"); 
+			addResource(resources, "http://stcocos.com.xsph.ru/static_trains/starling_locomotive_resources.swf"); 
 			ResourceManager.instance.loadBunch(resources, onResoursesLoadingProgress, onResoursesLoadingComplete);
+			var stats:Stats = new Stats();
+			addChild(stats);
 		}
 		
 		private function addResource(out:Array, url:String, shortId:String = null, preventCaching:Boolean = false,
