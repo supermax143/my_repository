@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" creationComplete="init()">
+	<fx:Script>
+		<![CDATA[
+			import dragonBones.Armature;
+			import dragonBones.Bone;
+			import dragonBones.events.AnimationEvent;
+			import dragonBones.events.FrameEvent;
+			import dragonBones.factorys.BaseFactory;
+			
+			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
+			
+			import resources.ResourceManager;
+			import resources.ResourceManagerImpl;
+			
+			import spark.events.IndexChangeEvent;
+			
+			
+		
+			[Embed(source = "robot_output.swf", mimeType = "application/octet-stream")]  
+			private static const ResourcesData:Class;
+			
+			
+			[Bindable]
+			private var robotParts:ArrayCollection;
+			[Bindable]
+			private var atackMovments:ArrayCollection;	
+			
+			
+			private var factory:BaseFactory;
+			private var atackRobotArmature:Armature;		
+			private var atackRobot:Sprite;
+			private var attackCollision:Bone;
+			
+			
+			
+			private var defendRobotArmature:Armature;		
+			private var defendRobot:Sprite;
+			
+			private var serverURL:String='http://stcocos.com.xsph.ru/static_robots/item/';
+			
+			
+			protected function init():void
+			{
+				ResourceManager.instance = new ResourceManagerImpl();
+				robotParts = new ArrayCollection([
+					new RobotPartsContainer("робот1",'0','31','41','21','12','3')
+				])
+				
+				atackMovments = new ArrayCollection();
+				factory = new BaseFactory(); 
+				factory.addEventListener(Event.COMPLETE, textureCompleteHandler);
+				factory.parseData(new ResourcesData());
+			}
+			
+			private function textureCompleteHandler(event:Event):void
+			{
+				atackRobotArmature = factory.buildArmature("Atack");
+				atackRobotArmature.animation.timeScale = 1;
+				atackRobot = atackRobotArmature.display as Sprite;
+				atackRobot.scaleX = -1;
+				atackRobot.x= -300;
+				atackRobot.y = 100;
+				for each(var movement:String in atackRobotArmature.animation.movementList)
+				{
+					atackMovments.addItem(movement);
+					atackRobotArmature.animation.gotoAndPlay(atackMovments.getItemAt(0));
+				}
+				robotContainer.addChild(atackRobot);
+				attackCollision = atackRobotArmature.getBone("collision_layer");
+				
+				
+				defendRobotArmature = factory.buildArmature("Hit");
+				defendRobotArmature.animation.timeScale = 1;
+				defendRobot = defendRobotArmature.display as Sprite;
+				defendRobot.x= 50;
+				defendRobot.y = 100;
+				robotContainer.addChild(defendRobot);
+				addEventListener(Event.ENTER_FRAME,enterframeHandler)
+				
+				
+				
+				atackRobotArmature.addEventListener(AnimationEvent.START,traceEvent);
+			}
+			
+			
+			
+			private function traceEvent(event:Event):void
+			{
+				trace(event)
+			}
+			
+			
+			private function enterframeHandler(event:Event):void
+			{
+				atackRobotArmature.update();
+				defendRobotArmature.update();
+				if(attackCollision)
+				{
+					if(attackCollision.displayVisible)
+						trace(atackRobotArmature.animation.movementID)
+				}
+			}
+			
+			
+			protected function showAnimation(event:IndexChangeEvent):void
+			{
+				atackRobotArmature.animation.gotoAndPlay(animationsList.selectedItem);
+				defendRobotArmature.animation.gotoAndPlay(animationsList.selectedItem+'_hit');
+			}
+			
+			
+			
+			
+			protected function changeRobotParts(event:IndexChangeEvent):void
+			{
+				var partsContainer:RobotPartsContainer = partsList.selectedItem as RobotPartsContainer;
+				var golova:Bone = atackRobotArmature.getBone("golova");
+				golova.display = partsContainer.golovaImage;
+				var tors:Bone = atackRobotArmature.getBone("tors");
+				tors.display = partsContainer.torsImage;
+				
+				
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<s:HGroup>
+		<s:DropDownList id="animationsList" dataProvider="{atackMovments}" change="showAnimation(event)"/>
+		<s:DropDownList id="partsList" dataProvider="{robotParts}" labelField="name"
+						change="changeRobotParts(event)"/>
+	</s:HGroup>
+	
+	<s:SpriteVisualElement id="robotContainer" x="500" y="400"/>
+	
+	
+</s:Group>
