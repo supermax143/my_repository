@@ -76,7 +76,7 @@
 				defendRobotArmature = factory.buildArmature("Hit");
 				defendRobotArmature.animation.timeScale = 1;
 				defendRobot = defendRobotArmature.display as Sprite;
-				defendRobot.x= 50;
+				defendRobot.x= 60;
 				defendRobot.y = 100;
 				robotContainer.addChild(defendRobot);
 				addEventListener(Event.ENTER_FRAME,enterframeHandler)
@@ -101,7 +101,10 @@
 				if(attackCollision)
 				{
 					if(attackCollision.displayVisible)
-						trace(atackRobotArmature.animation.movementID)
+					{
+						defendRobotArmature.animation.gotoAndPlay(atackRobotArmature.animation.movementID+'_hit');
+					}
+					
 				}
 			}
 			
@@ -109,7 +112,7 @@
 			protected function showAnimation(event:IndexChangeEvent):void
 			{
 				atackRobotArmature.animation.gotoAndPlay(animationsList.selectedItem);
-				defendRobotArmature.animation.gotoAndPlay(animationsList.selectedItem+'_hit');
+				//defendRobotArmature.animation.gotoAndPlay(animationsList.selectedItem+'_hit');
 			}
 			
 			
