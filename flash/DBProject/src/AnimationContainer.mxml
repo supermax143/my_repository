@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/mx" creationComplete="init()">
+		 xmlns:mx="library://ns.adobe.com/flex/mx" creationComplete="init()"
+		 
+		 >
 	<fx:Script>
 		<![CDATA[
 			import dragonBones.Armature;
@@ -12,32 +14,36 @@
 			
 			import mx.collections.ArrayCollection;
 			import mx.events.FlexEvent;
+			import mx.events.ItemClickEvent;
 			
 			import resources.ResourceManager;
 			import resources.ResourceManagerImpl;
 			
 			import spark.events.IndexChangeEvent;
 			
+			[Embed(source = "assets/Robot_output.swf", mimeType = "application/octet-stream")]  
+			private static const RobotResourcesData:Class;
+			
+			[Embed(source = "assets/Boss1_output.swf", mimeType = "application/octet-stream")]  
+			private static const BossResourcesData:Class;
+			
 			
 		
-			[Embed(source = "robot_output.swf", mimeType = "application/octet-stream")]  
-			private static const ResourcesData:Class;
-			
-			
-			[Bindable]
-			private var robotParts:ArrayCollection;
 			[Bindable]
 			private var atackMovments:ArrayCollection;	
 			
 			
 			private var factory:BaseFactory;
+			private var bossFactory:BaseFactory;
 			private var atackRobotArmature:Armature;		
 			private var atackRobot:Sprite;
-			private var attackCollision:Bone;
 			
 			
 			
-			private var defendRobotArmature:Armature;		
+			private var hitRobotArmature:Armature;		
+			private var deathRobotArmature:Armature;
+			
+			private var _defendRobotArmature:Armature
 			private var defendRobot:Sprite;
 			
 			private var serverURL:String='http://stcocos.com.xsph.ru/static_robots/item/';
@@ -46,20 +52,19 @@
 			protected function init():void
 			{
 				ResourceManager.instance = new ResourceManagerImpl();
-				robotParts = new ArrayCollection([
-					new RobotPartsContainer("робот1",'0','31','41','21','12','3')
-				])
 				
 				atackMovments = new ArrayCollection();
 				factory = new BaseFactory(); 
+				factory.parseData(new RobotResourcesData());
 				factory.addEventListener(Event.COMPLETE, textureCompleteHandler);
-				factory.parseData(new ResourcesData());
+				
+				bossFactory = new BaseFactory();
+				bossFactory.parseData(new BossResourcesData());
 			}
 			
 			private function textureCompleteHandler(event:Event):void
 			{
-				atackRobotArmature = factory.buildArmature("Atack");
-				atackRobotArmature.animation.timeScale = 1;
+				atackRobotArmature = factory.buildArmature("Animations/Atack");
 				atackRobot = atackRobotArmature.display as Sprite;
 				atackRobot.scaleX = -1;
 				atackRobot.x= -300;
@@ -67,77 +72,91 @@
 				for each(var movement:String in atackRobotArmature.animation.movementList)
 				{
 					atackMovments.addItem(movement);
-					atackRobotArmature.animation.gotoAndPlay(atackMovments.getItemAt(0));
 				}
 				robotContainer.addChild(atackRobot);
-				attackCollision = atackRobotArmature.getBone("collision_layer");
+				atackRobotArmature.addEventListener(FrameEvent.MOVEMENT_FRAME_EVENT,collisionHandler)
+				 
+				
+				hitRobotArmature = bossFactory.buildArmature("Hit");
+				deathRobotArmature = bossFactory.buildArmature("Death");
+				defendRobotArmature = hitRobotArmature;
 				
 				
-				defendRobotArmature = factory.buildArmature("Hit");
-				defendRobotArmature.animation.timeScale = 1;
-				defendRobot = defendRobotArmature.display as Sprite;
-				defendRobot.x= 60;
-				defendRobot.y = 100;
-				robotContainer.addChild(defendRobot);
+				initAramatures();
 				addEventListener(Event.ENTER_FRAME,enterframeHandler)
 				
-				
-				
-				atackRobotArmature.addEventListener(AnimationEvent.START,traceEvent);
-			}
-			
-			
-			
-			private function traceEvent(event:Event):void
-			{
-				trace(event)
 			}
 			
 			
 			private function enterframeHandler(event:Event):void
 			{
 				atackRobotArmature.update();
-				defendRobotArmature.update();
-				if(attackCollision)
-				{
-					if(attackCollision.displayVisible)
-					{
-						defendRobotArmature.animation.gotoAndPlay(atackRobotArmature.animation.movementID+'_hit');
-					}
-					
-				}
+				_defendRobotArmature.update();
 			}
 			
 			
 			protected function showAnimation(event:IndexChangeEvent):void
 			{
 				atackRobotArmature.animation.gotoAndPlay(animationsList.selectedItem);
-				//defendRobotArmature.animation.gotoAndPlay(animationsList.selectedItem+'_hit');
+				
 			}
 			
-			
-			
-			
-			protected function changeRobotParts(event:IndexChangeEvent):void
+			private function collisionHandler(event:FrameEvent):void
 			{
-				var partsContainer:RobotPartsContainer = partsList.selectedItem as RobotPartsContainer;
-				var golova:Bone = atackRobotArmature.getBone("golova");
-				golova.display = partsContainer.golovaImage;
-				var tors:Bone = atackRobotArmature.getBone("tors");
-				tors.display = partsContainer.torsImage;
-				
+				if(event.frameLabel!='collision')
+					return;
+				_defendRobotArmature.animation.gotoAndPlay(event.movementID);
+				//_defendRobotArmature.animation.timeScale = .1;
+				//atackRobotArmature.animation.timeScale = .1;
+			}
+			
+			
+			private function initAramatures():void
+			{
+				atackRobotArmature.animation.gotoAndPlay('init');
+				hitRobotArmature.animation.gotoAndPlay('init');
+				deathRobotArmature.animation.gotoAndPlay('init');
+				_defendRobotArmature.animation.timeScale = 1;
+				atackRobotArmature.animation.timeScale = 1;
+			}
+			
+			
+			protected function collisionTypeChanged():void
+			{
+				defendRobotArmature = colType.selectedValue==1?hitRobotArmature:deathRobotArmature; 
 				
 			}
+			
+			public function set defendRobotArmature(value:Armature):void
+			{
+				_defendRobotArmature = value;
+				if(defendRobot)
+					robotContainer.removeChild(defendRobot);
+				defendRobot = value.display as Sprite;
+				defendRobot.x= 60;
+				defendRobot.y = 100;
+				robotContainer.addChild(defendRobot);
+			}
+
 			
 		]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<s:RadioButtonGroup id="colType"
+							itemClick="collisionTypeChanged()"/>
 	</fx:Declarations>
 	<s:HGroup>
+		<s:Button label="reinit" click="initAramatures()"/>
 		<s:DropDownList id="animationsList" dataProvider="{atackMovments}" change="showAnimation(event)"/>
-		<s:DropDownList id="partsList" dataProvider="{robotParts}" labelField="name"
-						change="changeRobotParts(event)"/>
+		<s:Spacer width="10"/>
+		<s:RadioButton label="hit"
+					   value="1"
+					   group="{colType}"/>
+		<s:RadioButton label="death"
+					   value="2"
+					   group="{colType}"/>
+	
 	</s:HGroup>
 	
 	<s:SpriteVisualElement id="robotContainer" x="500" y="400"/>
