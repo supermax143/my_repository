@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 creationComplete="init()">
+	<fx:Script>
+		<![CDATA[
+			import br.com.stimuli.loading.loadingtypes.LoadingItem;
+			
+			import dollview.Doll;
+			import dollview.RobotDoll;
+			
+			import mx.collections.ArrayCollection;
+			
+			import resources.BunchLoadingItem;
+			import resources.ResourceManager;
+			[Bindable]
+			private var robotsResources:ArrayCollection;
+			
+			private var doll1:Doll;
+			
+			protected function init():void
+			{
+				robotsResources = new ArrayCollection();
+				ResourceManager.instance = new DBResourceManager();
+				loadResources();
+				
+			}
+			
+			private function loadResources():void
+			{
+				var resources:Array = [];
+				var assetsURL:String = 'assets/'
+				addResource(resources, assetsURL+Doll.ROBOT_TYPE+'.swf',Doll.ROBOT_TYPE); 
+				
+				for (var i:int = 1; i < 20; i++) 
+				{
+					addResource(resources, assetsURL+Doll.BOSS_TYPE+i+'.swf',Doll.BOSS_TYPE+1)
+				}
+				
+				ResourceManager.instance.loadBunch(resources, onResoursesLoadingProgress, onResoursesLoadingComplete,onResoursesLoadingError);
+			}
+			
+			private function addResource(out:Array, url:String, shortId:String = null, preventCaching:Boolean = false,
+										 isPost:Boolean = false, isBinary:Boolean = true, postData:Object = null):void{
+				
+				const data:URLVariables = new URLVariables();
+				if (postData!=null){
+					for(var key:String in postData)
+						data[key] = postData[key];
+				}
+				const item:BunchLoadingItem = new BunchLoadingItem(url, shortId, preventCaching, isPost, isBinary, data);
+				out.push(item);
+			}
+			
+			private function onResoursesLoadingProgress(progres:Number):void
+			{
+				trace(progres);
+			}
+			
+			private function onResoursesLoadingComplete():void
+			{
+				initResources();
+			}
+			
+			private function onResoursesLoadingError(event:Event):void
+			{
+				initResources();
+			}
+			
+			private function initResources():void
+			{
+				var item:LoadingItem = ResourceManager.instance.getLoadingItem(Doll.ROBOT_TYPE);
+				if(item)
+					robotsResources.addItem(item.id);
+				
+				for (var i:int = 0; i < 20; i++) 
+				{
+					item = ResourceManager.instance.getLoadingItem(Doll.BOSS_TYPE+i);
+					if(item)
+						robotsResources.addItem(item.id);
+				}
+				var doll:RobotDoll = new RobotDoll(Doll.ROBOT_TYPE);
+				doll.scaleX = -1;
+				dollContainer.addChild(doll);
+			}
+			
+			
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<s:DropDownList dataProvider="{robotsResources}"/>
+	<s:SpriteVisualElement id="dollContainer" x="200" y="400"/>
+</s:Group>

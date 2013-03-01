@@ -25,6 +25,7 @@
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
-	<local:AnimationContainer width="100%" height="100%"/>
+	<!--<local:AnimationContainer width="100%" height="100%"/>-->
+	<local:AnimationViewer width="100%" height="100%"/>
 	<s:SWFLoader source="{new Stats()}" top="0" right="70"/>
 </s:Application>

@@ -6,18 +6,16 @@
 		 >
 	<fx:Script>
 		<![CDATA[
+			import br.com.stimuli.loading.loadingtypes.LoadingItem;
+			
 			import dragonBones.Armature;
-			import dragonBones.Bone;
-			import dragonBones.events.AnimationEvent;
 			import dragonBones.events.FrameEvent;
 			import dragonBones.factorys.BaseFactory;
 			
 			import mx.collections.ArrayCollection;
-			import mx.events.FlexEvent;
-			import mx.events.ItemClickEvent;
 			
+			import resources.BunchLoadingItem;
 			import resources.ResourceManager;
-			import resources.ResourceManagerImpl;
 			
 			import spark.events.IndexChangeEvent;
 			
@@ -33,8 +31,8 @@
 			private var atackMovments:ArrayCollection;	
 			
 			
-			private var factory:BaseFactory;
-			private var bossFactory:BaseFactory;
+			private var atackerFactory:BaseFactory;
+			private var defenderFactory:BaseFactory;
 			private var atackRobotArmature:Armature;		
 			private var atackRobot:Sprite;
 			
@@ -46,25 +44,81 @@
 			private var _defendRobotArmature:Armature
 			private var defendRobot:Sprite;
 			
-			private var serverURL:String='http://stcocos.com.xsph.ru/static_robots/item/';
 			
 			
 			protected function init():void
 			{
-				ResourceManager.instance = new ResourceManagerImpl();
+				ResourceManager.instance = new DBResourceManager();
+				loadResources();
 				
 				atackMovments = new ArrayCollection();
-				factory = new BaseFactory(); 
-				factory.parseData(new RobotResourcesData());
-				factory.addEventListener(Event.COMPLETE, textureCompleteHandler);
+				atackerFactory = new BaseFactory(); 
+				atackerFactory.parseData(new BossResourcesData());
 				
-				bossFactory = new BaseFactory();
-				bossFactory.parseData(new BossResourcesData());
+				defenderFactory = new BaseFactory();
+				defenderFactory.parseData(new RobotResourcesData());
+				
+				
+				atackerFactory.addEventListener(Event.COMPLETE, textureCompleteHandler);
+				
 			}
+			
+			private function loadResources():void
+			{
+				var resources:Array = [];
+				var assetsURL:String = 'assets/'
+				addResource(resources, "assets/Robot_output.swf"); 
+				for (var i:int = 0; i < 20; i++) 
+				{
+					addResource(resources, "assets/Boss1_output.swf"); 
+				}
+				
+				ResourceManager.instance.loadBunch(resources, onResoursesLoadingProgress, onResoursesLoadingComplete,onResoursesLoadingError);
+			}
+			
+			private function addResource(out:Array, url:String, shortId:String = null, preventCaching:Boolean = false,
+										 isPost:Boolean = false, isBinary:Boolean = true, postData:Object = null):void{
+				
+				const data:URLVariables = new URLVariables();
+				if (postData!=null){
+					for(var key:String in postData)
+						data[key] = postData[key];
+				}
+				const item:BunchLoadingItem = new BunchLoadingItem(url, shortId, preventCaching, isPost, isBinary, data);
+				out.push(item);
+			}
+			
+			private function onResoursesLoadingProgress(progres:Number):void
+			{
+				trace(progres);
+			}
+			
+			private function onResoursesLoadingComplete():void
+			{
+				initResources();
+			}
+			
+			private function onResoursesLoadingError(event:Event):void
+			{
+				initResources();
+			}
+			
+			private function initResources():void
+			{
+				var item:LoadingItem = ResourceManager.instance.getLoadingItem('assets/Robot_output.swf');
+			}
+			
+			
 			
 			private function textureCompleteHandler(event:Event):void
 			{
-				atackRobotArmature = factory.buildArmature("Animations/Atack");
+				 
+				
+				hitRobotArmature = defenderFactory.buildArmature("Boss1/Hit");
+				deathRobotArmature = defenderFactory.buildArmature("Boss1/Death");
+				defendRobotArmature = hitRobotArmature;
+				
+				atackRobotArmature = atackerFactory.buildArmature("Atack");
 				atackRobot = atackRobotArmature.display as Sprite;
 				atackRobot.scaleX = -1;
 				atackRobot.x= -300;
@@ -73,14 +127,8 @@
 				{
 					atackMovments.addItem(movement);
 				}
-				robotContainer.addChild(atackRobot);
+				atackRobotContainer.addChild(atackRobot);
 				atackRobotArmature.addEventListener(FrameEvent.MOVEMENT_FRAME_EVENT,collisionHandler)
-				 
-				
-				hitRobotArmature = bossFactory.buildArmature("Hit");
-				deathRobotArmature = bossFactory.buildArmature("Death");
-				defendRobotArmature = hitRobotArmature;
-				
 				
 				initAramatures();
 				addEventListener(Event.ENTER_FRAME,enterframeHandler)
@@ -106,8 +154,8 @@
 				if(event.frameLabel!='collision')
 					return;
 				_defendRobotArmature.animation.gotoAndPlay(event.movementID);
-				//_defendRobotArmature.animation.timeScale = .1;
-				//atackRobotArmature.animation.timeScale = .1;
+				//_defendRobotArmature.animation.timeScale = .5;
+				//atackRobotArmature.animation.timeScale = .5;
 			}
 			
 			
@@ -131,11 +179,11 @@
 			{
 				_defendRobotArmature = value;
 				if(defendRobot)
-					robotContainer.removeChild(defendRobot);
+					defendRobotContainer.removeChild(defendRobot);
 				defendRobot = value.display as Sprite;
 				defendRobot.x= 60;
 				defendRobot.y = 100;
-				robotContainer.addChild(defendRobot);
+				defendRobotContainer.addChild(defendRobot);
 			}
 
 			
@@ -159,7 +207,7 @@
 	
 	</s:HGroup>
 	
-	<s:SpriteVisualElement id="robotContainer" x="500" y="400"/>
-	
+	<s:SpriteVisualElement id="defendRobotContainer" x="500" y="400"/>
+	<s:SpriteVisualElement id="atackRobotContainer" x="500" y="400"/>
 	
 </s:Group>
