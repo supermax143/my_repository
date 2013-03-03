@@ -5,23 +5,20 @@ package dollview
 	import dragonBones.factorys.BaseFactory;
 	
 	import flash.events.Event;
-	
-	import resources.ResourceManager;
 
-	public class RobotDoll extends Doll
+	public class BossDoll extends Doll
 	{
-		public function RobotDoll(type:String)
+		public function BossDoll(type:String)
 		{
 			super(type);
-			
 		}
 		
 		override protected function factoryInited(factory:BaseFactory):void
 		{
 			super.factoryInited(factory);
-			atackArmature = factory.buildArmature("Animations/Atack");
-			hitArmature = factory.buildArmature("Animations/Hit");
-			deathArmature = factory.buildArmature("Animations/Death");
+			atackArmature = factory.buildArmature("Atack");
+			hitArmature = factory.buildArmature("Hit");
+			deathArmature = factory.buildArmature("Death");
 			currentArmature = atackArmature;
 			dispatchEvent(new DollEvent(DollEvent.INITED));
 		}

@@ -7,8 +7,8 @@
 		<![CDATA[
 			import br.com.stimuli.loading.loadingtypes.LoadingItem;
 			
-			import dollview.Doll;
-			import dollview.RobotDoll;
+			import dollview.*;
+			import dollview.events.DollEvent;
 			
 			import mx.collections.ArrayCollection;
 			
@@ -16,6 +16,9 @@
 			import resources.ResourceManager;
 			[Bindable]
 			private var robotsResources:ArrayCollection;
+			[Bindable]
+			private var atacks:ArrayCollection;
+			
 			
 			private var doll1:Doll;
 			
@@ -31,11 +34,11 @@
 			{
 				var resources:Array = [];
 				var assetsURL:String = 'assets/'
-				addResource(resources, assetsURL+Doll.ROBOT_TYPE+'.swf',Doll.ROBOT_TYPE); 
+				addResource(resources, assetsURL+Doll.ROBOT_TYPE+'_output.swf',Doll.ROBOT_TYPE); 
 				
 				for (var i:int = 1; i < 20; i++) 
 				{
-					addResource(resources, assetsURL+Doll.BOSS_TYPE+i+'.swf',Doll.BOSS_TYPE+1)
+					addResource(resources, assetsURL+Doll.BOSS_TYPE+i+'_output.swf',Doll.BOSS_TYPE+1)
 				}
 				
 				ResourceManager.instance.loadBunch(resources, onResoursesLoadingProgress, onResoursesLoadingComplete,onResoursesLoadingError);
@@ -80,18 +83,63 @@
 					if(item)
 						robotsResources.addItem(item.id);
 				}
-				var doll:RobotDoll = new RobotDoll(Doll.ROBOT_TYPE);
-				doll.scaleX = -1;
-				dollContainer.addChild(doll);
+				
+				
 			}
 			
 			
+			
+			protected function selectRobot1():void
+			{
+				while(dollContainer1.numChildren>0)
+				{
+					doll1 = dollContainer1.getChildAt(0) as Doll;
+					doll1.dispose();
+					doll1.removeEventListener(DollEvent.INITED,dollInited);
+					dollContainer1.removeChildAt(0);
+				}
+				
+				var dollType:String = dollsList.selectedItem;
+				if(dollType==Doll.ROBOT_TYPE)
+				{
+					doll1 = new RobotDoll(dollType);
+				}
+				else
+				{
+					doll1 = new BossDoll(dollType);
+				}
+				doll1.scaleX = -1;
+				doll1.addEventListener(DollEvent.INITED,dollInited);
+				dollContainer1.addChild(doll1);
+				
+			}
+			
+			private function dollInited(event:Event):void
+			{
+				var doll:Doll = event.currentTarget as Doll;
+				atacks = doll.getAtacksList();
+				
+			}
+				
+			
+			
+			private function atack():void
+			{
+				doll1.atack(atacksList.selectedItem);
+			}
 			
 		]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
-	<s:DropDownList dataProvider="{robotsResources}"/>
-	<s:SpriteVisualElement id="dollContainer" x="200" y="400"/>
+	<s:HGroup>
+		<s:DropDownList id="dollsList" dataProvider="{robotsResources}"
+						change="selectRobot1()"/>
+		<s:VGroup>
+			<s:DropDownList id="atacksList" dataProvider="{atacks}"/>
+			<s:Button label="atack" click="atack()"/>
+		</s:VGroup>
+	</s:HGroup>
+	<s:SpriteVisualElement id="dollContainer1" x="200" y="600"/>
 </s:Group>

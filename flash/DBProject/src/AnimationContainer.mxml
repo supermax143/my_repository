@@ -53,7 +53,7 @@
 				
 				atackMovments = new ArrayCollection();
 				atackerFactory = new BaseFactory(); 
-				atackerFactory.parseData(new BossResourcesData());
+				atackerFactory.parseData(new RobotResourcesData());
 				
 				defenderFactory = new BaseFactory();
 				defenderFactory.parseData(new RobotResourcesData());
@@ -114,11 +114,11 @@
 			{
 				 
 				
-				hitRobotArmature = defenderFactory.buildArmature("Boss1/Hit");
-				deathRobotArmature = defenderFactory.buildArmature("Boss1/Death");
+				hitRobotArmature = defenderFactory.buildArmature("Animations/Hit");
+				deathRobotArmature = defenderFactory.buildArmature("Animations/Death");
 				defendRobotArmature = hitRobotArmature;
 				
-				atackRobotArmature = atackerFactory.buildArmature("Atack");
+				atackRobotArmature = atackerFactory.buildArmature("Animations/Atack");
 				atackRobot = atackRobotArmature.display as Sprite;
 				atackRobot.scaleX = -1;
 				atackRobot.x= -300;

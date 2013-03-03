@@ -2,12 +2,16 @@ package dollview
 {
 	import br.com.stimuli.loading.loadingtypes.ImageItem;
 	
+	import dollview.events.DollEvent;
+	
 	import dragonBones.Armature;
 	import dragonBones.factorys.BaseFactory;
 	
 	import flash.display.Loader;
 	import flash.display.Sprite;
 	import flash.events.Event;
+	
+	import mx.collections.ArrayCollection;
 	
 	import resources.ResourceManager;
 
@@ -28,11 +32,14 @@ package dollview
 		
 		public function Doll(type:String)
 		{
-			factory = new BaseFactory();
 			var resourceData:* = ResourceManager.instance.getBinary(type,false);
-			factory.parseData(resourceData);
-			factory.addEventListener(Event.COMPLETE, initArmature);
+			FactoriesManager.addFactory(resourceData,factoryInited);
 			addEventListener(Event.ENTER_FRAME,updateAnimation);
+		}
+		
+		protected function factoryInited(factory:BaseFactory):void
+		{
+			this.factory = factory;
 		}
 		
 		private function updateAnimation(event:Event):void
@@ -41,13 +48,10 @@ package dollview
 				_currentArmature.update();
 		}
 		
-		protected function initArmature(event:Event):void
+		protected function set currentArmature(value:Armature):void
 		{
-			throw new Error('method must be overriden');
-		}
-		
-		public function set currentArmature(value:Armature):void
-		{
+			if(_currentArmature==value)
+				return;
 			_currentArmature = value;
 			if(robot)
 				removeChild(robot);
@@ -55,6 +59,33 @@ package dollview
 			addChild(robot);
 			_currentArmature.animation.gotoAndPlay('init');
 		}
+		
+		public function atack(atackId:String):void
+		{
+			currentArmature = atackArmature;
+			_currentArmature.animation.gotoAndPlay(atackId);
+		}
+		
+		public function getAtacksList():ArrayCollection
+		{
+			var arr:ArrayCollection = new ArrayCollection();
+			for each (var atack:String in atackArmature.animation.movementList) 
+				arr.addItem(atack);
+			return arr;	
+		}
+		
+		public function dispose():void
+		{
+			removeEventListener(Event.ENTER_FRAME,updateAnimation);
+			atackArmature.dispose();
+			atackArmature = null;
+			hitArmature.dispose();
+			hitArmature = null;
+			deathArmature.dispose();
+			deathArmature = null;
+			_currentArmature = null;
+		}
+			
 		
 	}
 }
