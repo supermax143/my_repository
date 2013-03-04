@@ -6,9 +6,13 @@ package dollview.events
 	{
 		
 		public static const INITED:String = 'inited';
+		public static const COLLIDE:String = 'collide';
 		
-		public function DollEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false)
+		public var movementId:String = '';
+		
+		public function DollEvent(type:String,movementId:String='',bubbles:Boolean=false, cancelable:Boolean=false)
 		{
+			this.movementId = movementId;
 			super(type, bubbles, cancelable);
 		}
 	}

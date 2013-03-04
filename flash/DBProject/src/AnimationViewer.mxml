@@ -21,6 +21,7 @@
 			
 			
 			private var doll1:Doll;
+			private var doll2:Doll;
 			
 			protected function init():void
 			{
@@ -74,13 +75,13 @@
 			private function initResources():void
 			{
 				var item:LoadingItem = ResourceManager.instance.getLoadingItem(Doll.ROBOT_TYPE);
-				if(item)
+				if(item&&item._isLoaded)
 					robotsResources.addItem(item.id);
 				
 				for (var i:int = 0; i < 20; i++) 
 				{
 					item = ResourceManager.instance.getLoadingItem(Doll.BOSS_TYPE+i);
-					if(item)
+					if(item&&item._isLoaded)
 						robotsResources.addItem(item.id);
 				}
 				
@@ -95,11 +96,12 @@
 				{
 					doll1 = dollContainer1.getChildAt(0) as Doll;
 					doll1.dispose();
-					doll1.removeEventListener(DollEvent.INITED,dollInited);
+					doll1.removeEventListener(DollEvent.INITED,doll1Inited);
+					doll1.removeEventListener(DollEvent.COLLIDE,handleAtackCollision);
 					dollContainer1.removeChildAt(0);
 				}
 				
-				var dollType:String = dollsList.selectedItem;
+				var dollType:String = dolls1List.selectedItem;
 				if(dollType==Doll.ROBOT_TYPE)
 				{
 					doll1 = new RobotDoll(dollType);
@@ -109,23 +111,78 @@
 					doll1 = new BossDoll(dollType);
 				}
 				doll1.scaleX = -1;
-				doll1.addEventListener(DollEvent.INITED,dollInited);
-				dollContainer1.addChild(doll1);
+				if(!doll1.inited)
+					doll1.addEventListener(DollEvent.INITED,doll1Inited);
+				else
+					doll1Inited();
 				
+				doll1.addEventListener(DollEvent.COLLIDE,handleAtackCollision);
+				dollContainer1.addChild(doll1);
 			}
 			
-			private function dollInited(event:Event):void
+			
+			
+			private function doll1Inited(event:Event=null):void
 			{
-				var doll:Doll = event.currentTarget as Doll;
-				atacks = doll.getAtacksList();
-				
+				atacks = doll1.getAtacksList();
+				setOpponents()
 			}
-				
+			
+			private function doll2Inited(event:Event=null):void
+			{
+				atacks = doll1.getAtacksList();
+				setOpponents();
+			}
 			
 			
 			private function atack():void
 			{
 				doll1.atack(atacksList.selectedItem);
+			}
+			
+			private function selectRobot2():void
+			{
+				while(dollContainer2.numChildren>0)
+				{
+					doll2 = dollContainer2.getChildAt(0) as Doll;
+					doll2.dispose();
+					doll2.removeEventListener(DollEvent.INITED,doll2Inited);
+					dollContainer2.removeChildAt(0);
+				}
+				
+				var dollType:String = dolls2List.selectedItem;
+				if(dollType==Doll.ROBOT_TYPE)
+				{
+					doll2 = new RobotDoll(dollType);
+				}
+				else
+				{
+					doll2 = new BossDoll(dollType);
+				}
+				if(!doll2.inited)
+					doll2.addEventListener(DollEvent.INITED,doll2Inited);
+				else
+					doll2Inited();
+				dollContainer2.addChild(doll2);
+			}
+			
+			private function setOpponents():void
+			{
+				if(!doll1||!doll2)
+					return;
+				if(!doll1.inited||!doll2.inited)
+					return;
+					
+				doll1.setOpponent(doll2.type);
+				doll2.setOpponent(doll1.type);
+				
+			}
+			
+			private function handleAtackCollision(event:DollEvent):void
+			{
+				if(!doll2)
+					return;
+				doll2.atackReaction(event.movementId,deathCheckbox.selected);
 			}
 			
 		]]>
@@ -134,12 +191,30 @@
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
 	<s:HGroup>
-		<s:DropDownList id="dollsList" dataProvider="{robotsResources}"
-						change="selectRobot1()"/>
-		<s:VGroup>
-			<s:DropDownList id="atacksList" dataProvider="{atacks}"/>
-			<s:Button label="atack" click="atack()"/>
-		</s:VGroup>
+		<s:SkinnableContainer backgroundColor="0x999999">
+			<s:VGroup left="3" top="3">
+				<s:Label text="Атакующий" fontSize="16" />
+				<s:HGroup>
+					<s:DropDownList id="dolls1List" dataProvider="{robotsResources}"
+									change="selectRobot1()"/>
+					<s:VGroup>
+						<s:DropDownList id="atacksList" dataProvider="{atacks}"/>
+						<s:Button label="atack" click="atack()"/>
+					</s:VGroup>
+				</s:HGroup>
+			</s:VGroup>
+		</s:SkinnableContainer>
+		<s:SkinnableContainer backgroundColor="0x999999">
+			<s:VGroup left="3" top="3">
+				<s:Label text="Робот для битья" fontSize="16" />
+				<s:HGroup>
+					<s:DropDownList id="dolls2List" dataProvider="{robotsResources}"
+									change="selectRobot2()"/>
+				</s:HGroup>
+				<s:CheckBox id="deathCheckbox" label="Смерть" selected="false" />
+			</s:VGroup>
+		</s:SkinnableContainer>
 	</s:HGroup>
+	<s:SpriteVisualElement id="dollContainer2" x="560" y="600"/>
 	<s:SpriteVisualElement id="dollContainer1" x="200" y="600"/>
 </s:Group>

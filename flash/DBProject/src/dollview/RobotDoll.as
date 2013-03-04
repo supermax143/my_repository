@@ -22,8 +22,24 @@ package dollview
 			atackArmature = factory.buildArmature("Animations/Atack");
 			hitArmature = factory.buildArmature("Animations/Hit");
 			deathArmature = factory.buildArmature("Animations/Death");
-			currentArmature = atackArmature;
+			standArmature = factory.buildArmature("Animations/Stand");
+			playStandAnimation();
 			dispatchEvent(new DollEvent(DollEvent.INITED));
+		}
+		
+		override public function setOpponent(type:String):void
+		{
+			if(type.indexOf(Doll.BOSS_TYPE)!=-1)
+			{
+				hitArmature = factory.buildArmature(type+"/Hit");
+				deathArmature = factory.buildArmature(type+"/Death");
+			}
+			else
+			{
+				hitArmature = factory.buildArmature("Animations/Hit");
+				deathArmature = factory.buildArmature("Animations/Death");
+			}
+				
 		}
 		
 		

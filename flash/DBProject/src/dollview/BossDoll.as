@@ -19,7 +19,8 @@ package dollview
 			atackArmature = factory.buildArmature("Atack");
 			hitArmature = factory.buildArmature("Hit");
 			deathArmature = factory.buildArmature("Death");
-			currentArmature = atackArmature;
+			standArmature = factory.buildArmature("Stand");
+			playStandAnimation();
 			dispatchEvent(new DollEvent(DollEvent.INITED));
 		}
 		
