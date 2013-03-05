@@ -20,8 +20,8 @@
 			private var atacks:ArrayCollection;
 			
 			
-			private var doll1:Doll;
-			private var doll2:Doll;
+			private var doll1:DollBase;
+			private var doll2:DollBase;
 			
 			protected function init():void
 			{
@@ -35,11 +35,11 @@
 			{
 				var resources:Array = [];
 				var assetsURL:String = 'assets/'
-				addResource(resources, assetsURL+Doll.ROBOT_TYPE+'_output.swf',Doll.ROBOT_TYPE); 
+				addResource(resources, assetsURL+DollBase.ROBOT_TYPE+'_output.swf',DollBase.ROBOT_TYPE); 
 				
 				for (var i:int = 1; i < 20; i++) 
 				{
-					addResource(resources, assetsURL+Doll.BOSS_TYPE+i+'_output.swf',Doll.BOSS_TYPE+1)
+					addResource(resources, assetsURL+DollBase.BOSS_TYPE+i+'_output.swf',DollBase.BOSS_TYPE+1)
 				}
 				
 				ResourceManager.instance.loadBunch(resources, onResoursesLoadingProgress, onResoursesLoadingComplete,onResoursesLoadingError);
@@ -74,13 +74,13 @@
 			
 			private function initResources():void
 			{
-				var item:LoadingItem = ResourceManager.instance.getLoadingItem(Doll.ROBOT_TYPE);
+				var item:LoadingItem = ResourceManager.instance.getLoadingItem(DollBase.ROBOT_TYPE);
 				if(item&&item._isLoaded)
 					robotsResources.addItem(item.id);
 				
 				for (var i:int = 0; i < 20; i++) 
 				{
-					item = ResourceManager.instance.getLoadingItem(Doll.BOSS_TYPE+i);
+					item = ResourceManager.instance.getLoadingItem(DollBase.BOSS_TYPE+i);
 					if(item&&item._isLoaded)
 						robotsResources.addItem(item.id);
 				}
@@ -94,7 +94,7 @@
 			{
 				while(dollContainer1.numChildren>0)
 				{
-					doll1 = dollContainer1.getChildAt(0) as Doll;
+					doll1 = dollContainer1.getChildAt(0) as DollBase;
 					doll1.dispose();
 					doll1.removeEventListener(DollEvent.INITED,doll1Inited);
 					doll1.removeEventListener(DollEvent.COLLIDE,handleAtackCollision);
@@ -102,7 +102,7 @@
 				}
 				
 				var dollType:String = dolls1List.selectedItem;
-				if(dollType==Doll.ROBOT_TYPE)
+				if(dollType==DollBase.ROBOT_TYPE)
 				{
 					doll1 = new RobotDoll(dollType);
 				}
@@ -144,14 +144,14 @@
 			{
 				while(dollContainer2.numChildren>0)
 				{
-					doll2 = dollContainer2.getChildAt(0) as Doll;
+					doll2 = dollContainer2.getChildAt(0) as DollBase;
 					doll2.dispose();
 					doll2.removeEventListener(DollEvent.INITED,doll2Inited);
 					dollContainer2.removeChildAt(0);
 				}
 				
 				var dollType:String = dolls2List.selectedItem;
-				if(dollType==Doll.ROBOT_TYPE)
+				if(dollType==DollBase.ROBOT_TYPE)
 				{
 					doll2 = new RobotDoll(dollType);
 				}

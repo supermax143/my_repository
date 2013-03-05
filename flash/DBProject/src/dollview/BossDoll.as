@@ -6,7 +6,7 @@ package dollview
 	
 	import flash.events.Event;
 
-	public class BossDoll extends Doll
+	public class BossDoll extends DollBase
 	{
 		public function BossDoll(type:String)
 		{

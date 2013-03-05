@@ -17,7 +17,7 @@ package dollview
 	
 	import resources.ResourceManager;
 
-	public class Doll extends Sprite
+	public class DollBase extends Sprite
 	{
 		//--------------------------------------------------------------------------
 		//
@@ -56,7 +56,7 @@ package dollview
 		//  Constructor
 		//
 		//--------------------------------------------------------------------------
-		public function Doll(type:String)
+		public function DollBase(type:String)
 		{
 			this.type = type;
 			var resourceData:* = ResourceManager.instance.getBinary(type,false);

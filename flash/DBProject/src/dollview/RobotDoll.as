@@ -8,7 +8,7 @@ package dollview
 	
 	import resources.ResourceManager;
 
-	public class RobotDoll extends Doll
+	public class RobotDoll extends DollBase
 	{
 		public function RobotDoll(type:String)
 		{
@@ -29,7 +29,7 @@ package dollview
 		
 		override public function setOpponent(type:String):void
 		{
-			if(type.indexOf(Doll.BOSS_TYPE)!=-1)
+			if(type.indexOf(DollBase.BOSS_TYPE)!=-1)
 			{
 				hitArmature = factory.buildArmature(type+"/Hit");
 				deathArmature = factory.buildArmature(type+"/Death");
