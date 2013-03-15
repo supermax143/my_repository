@@ -223,6 +223,18 @@ public class DBResourceManager extends EventDispatcher implements IResourceManag
 	{
 		return _loader.get(id);
 	}
+	
+	public function addLoadingItem(id:String,props:Object=null):LoadingItem
+	{
+		
+		var item:LoadingItem = _loader.get(id);
+		if(item)
+			return item;
+		if(!props)
+			props = {};
+		props.context = _loaderContext;	
+		return _loader.add(id,props);
+	}
 }
 
 

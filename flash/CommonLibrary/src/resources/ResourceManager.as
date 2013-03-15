@@ -72,5 +72,10 @@ public class ResourceManager implements IResourceManager{
 		return null;
 	}
 	
+	public function addLoadingItem(id:String,props:Object=null):LoadingItem {
+		throw new Error("ResourceManager::getLoadingItem() not implemented!");
+		return null;
+	}
+	
 }
 }

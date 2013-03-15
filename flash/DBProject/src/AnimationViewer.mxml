@@ -7,13 +7,18 @@
 		<![CDATA[
 			import br.com.stimuli.loading.loadingtypes.LoadingItem;
 			
-			import dollview.*;
-			import dollview.events.DollEvent;
+			import dragonBones.animation.WorldClock;
 			
 			import mx.collections.ArrayCollection;
 			
 			import resources.BunchLoadingItem;
 			import resources.ResourceManager;
+			
+			import view.dollview.BossDoll;
+			import view.dollview.DollBase;
+			import view.dollview.RobotDoll;
+			import view.dollview.events.DollAnimationEvent;
+			import view.dollview.events.DollEvent;
 			[Bindable]
 			private var robotsResources:ArrayCollection;
 			[Bindable]
@@ -28,7 +33,13 @@
 				robotsResources = new ArrayCollection();
 				ResourceManager.instance = new DBResourceManager();
 				loadResources();
+				addEventListener(Event.ENTER_FRAME,onEnterFrame);
 				
+			}
+			
+			private function onEnterFrame(e:Event):void
+			{
+				WorldClock.clock.advanceTime(-1);
 			}
 			
 			private function loadResources():void
@@ -97,7 +108,7 @@
 					doll1 = dollContainer1.getChildAt(0) as DollBase;
 					doll1.dispose();
 					doll1.removeEventListener(DollEvent.INITED,doll1Inited);
-					doll1.removeEventListener(DollEvent.COLLIDE,handleAtackCollision);
+					doll1.removeEventListener(DollAnimationEvent.COLLIDE,handleAtackCollision);
 					dollContainer1.removeChildAt(0);
 				}
 				
@@ -116,7 +127,7 @@
 				else
 					doll1Inited();
 				
-				doll1.addEventListener(DollEvent.COLLIDE,handleAtackCollision);
+				doll1.addEventListener(DollAnimationEvent.COLLIDE,handleAtackCollision);
 				dollContainer1.addChild(doll1);
 			}
 			
@@ -124,6 +135,7 @@
 			
 			private function doll1Inited(event:Event=null):void
 			{
+				doll1.setOpponent(DollBase.ROBOT_TYPE);
 				atacks = doll1.getAtacksList();
 				setOpponents()
 			}
@@ -137,7 +149,7 @@
 			
 			private function atack():void
 			{
-				doll1.atack(atacksList.selectedItem);
+				doll1.showAtackAnimation(atacksList.selectedItem);
 			}
 			
 			private function selectRobot2():void
@@ -178,11 +190,11 @@
 				
 			}
 			
-			private function handleAtackCollision(event:DollEvent):void
+			private function handleAtackCollision(event:DollAnimationEvent):void
 			{
 				if(!doll2)
 					return;
-				doll2.atackReaction(event.movementId,deathCheckbox.selected);
+				doll2.showAtackReactionAnimation(event.movementId,deathCheckbox.selected);
 			}
 			
 		]]>

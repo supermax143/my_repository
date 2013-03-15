@@ -83,7 +83,7 @@ public class ResourceManagerImpl extends EventDispatcher implements IResourceMan
             props[BulkLoader.PREVENT_CACHING] = res.preventCache;
 
             var item:LoadingItem = null;
-            if (!res.isPost){
+            if (!res.isPost) {
                 item = _loader.add(res.url, props);
             }
             else{
@@ -91,8 +91,7 @@ public class ResourceManagerImpl extends EventDispatcher implements IResourceMan
                 postRequest.method = "POST";
                 postRequest.data = res.postData;
                 item = _loader.add(postRequest, props);
-            }
-			
+            }			
         }
 		
         if (queueSize > 0){
@@ -103,21 +102,26 @@ public class ResourceManagerImpl extends EventDispatcher implements IResourceMan
         }
     }
 
-    
-
     private function onBunchLoadedSuccessfully(event:BulkProgressEvent):void {
-        _currentLoadingBunch.completeHandler();
-        _isLoading = false;
+		if(!_currentLoadingBunch)
+			return;
+		var completeHandler:Function = _currentLoadingBunch.completeHandler;
+		_isLoading = false; 
         _currentLoadingBunch = null;
+		completeHandler();
         loadNext();
     }
 
     private function onBunchLoadingProgress(event:BulkProgressEvent):void {
+		if(!_currentLoadingBunch)
+			return;
         _currentLoadingBunch.progressHandler(event._ratioLoaded);
     }
 
     private function onLoadingError(event:ErrorEvent ):void {
         _isLoading = false;
+		if(!_currentLoadingBunch)
+			return;
 		_currentLoadingBunch.errorHandler(event);
     }
 
@@ -220,6 +224,18 @@ public class ResourceManagerImpl extends EventDispatcher implements IResourceMan
 	public function getLoadingItem(id:String):LoadingItem
 	{
 		return _loader.get(id);
+	}
+	
+	public function addLoadingItem(id:String,props:Object=null):LoadingItem
+	{
+		
+		var item:LoadingItem = _loader.get(id);
+		if(item)
+			return item;
+		if(!props)
+			props = {};
+		props.context = _loaderContext;	
+		return _loader.add(id,props);
 	}
 }
 
