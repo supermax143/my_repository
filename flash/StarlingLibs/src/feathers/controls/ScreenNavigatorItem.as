@@ -1,26 +1,9 @@
 /*
-Copyright 2012-2013 Joshua Tynjala
+Feathers
+Copyright 2012-2013 Joshua Tynjala. All Rights Reserved.
 
-Permission is hereby granted, free of charge, to any person
-obtaining a copy of this software and associated documentation
-files (the "Software"), to deal in the Software without
-restriction, including without limitation the rights to use,
-copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the
-Software is furnished to do so, subject to the following
-conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-OTHER DEALINGS IN THE SOFTWARE.
+This program is free software. You can redistribute and/or modify it in
+accordance with the terms of the accompanying license agreement.
 */
 package feathers.controls
 {
@@ -31,6 +14,20 @@ package feathers.controls
 	/**
 	 * Data for an individual screen that will be used by a <code>ScreenNavigator</code>
 	 * object.
+	 *
+	 * <p>The following example creates a new screen navigator item that
+	 * navigates to a "main menu" screen on <code>Event.COMPLETE</code> and
+	 * sets the <code>settings</code> property when the screen is displayed:</p>
+	 *
+	 * <listing version="3.0">
+	 * var item:ScreenNavigatorItem = new ScreenNavigatorItem( SettingsScreen,
+	 * {
+	 *     complete: MAIN_MENU_SCREEN_ID
+	 * },
+	 * {
+	 *     settings: settingsData
+	 * });
+	 * navigator.addScreen( SETTINGS_SCREEN_ID, item );</listing>
 	 *
 	 * @see http://wiki.starling-framework.org/feathers/screen-navigator
 	 * @see feathers.controls.ScreenNavigator

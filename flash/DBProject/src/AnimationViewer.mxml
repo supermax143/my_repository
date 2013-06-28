@@ -135,21 +135,21 @@
 			
 			private function doll1Inited(event:Event=null):void
 			{
-				doll1.setOpponent(DollBase.ROBOT_TYPE);
-				atacks = doll1.getAtacksList();
 				setOpponents()
+				doll1.setOpponent(DollBase.ROBOT_TYPE);
+				atacks = (doll1 as RobotDoll).getAtacksList();
 			}
 			
 			private function doll2Inited(event:Event=null):void
 			{
-				atacks = doll1.getAtacksList();
 				setOpponents();
+				atacks = (doll1 as RobotDoll).getAtacksList();
 			}
 			
 			
 			private function atack():void
 			{
-				doll1.showAtackAnimation(atacksList.selectedItem);
+				(doll1 as RobotDoll).showAtackAnimation(atacksList.selectedItem);
 			}
 			
 			private function selectRobot2():void

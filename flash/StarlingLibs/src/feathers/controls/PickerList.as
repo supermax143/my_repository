@@ -1,38 +1,23 @@
 /*
-Copyright 2012-2013 Joshua Tynjala
+Feathers
+Copyright 2012-2013 Joshua Tynjala. All Rights Reserved.
 
-Permission is hereby granted, free of charge, to any person
-obtaining a copy of this software and associated documentation
-files (the "Software"), to deal in the Software without
-restriction, including without limitation the rights to use,
-copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the
-Software is furnished to do so, subject to the following
-conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-OTHER DEALINGS IN THE SOFTWARE.
+This program is free software. You can redistribute and/or modify it in
+accordance with the terms of the accompanying license agreement.
 */
 package feathers.controls
 {
 	import feathers.controls.popups.CalloutPopUpContentManager;
 	import feathers.controls.popups.IPopUpContentManager;
 	import feathers.controls.popups.VerticalCenteredPopUpContentManager;
+	import feathers.controls.renderers.IListItemRenderer;
 	import feathers.core.FeathersControl;
 	import feathers.core.PropertyProxy;
 	import feathers.data.ListCollection;
 	import feathers.system.DeviceCapabilities;
 
 	import starling.core.Starling;
+	import starling.display.DisplayObject;
 	import starling.events.Event;
 	import starling.events.Touch;
 	import starling.events.TouchEvent;
@@ -49,18 +34,49 @@ package feathers.controls
 	 * A combo-box like list control. Displayed as a button. The list appears
 	 * on tap as a full-screen overlay.
 	 *
+	 * <p>The following example creates a picker list, gives it a data provider,
+	 * tells the item renderer how to interpret the data, and listens for when
+	 * the selection changes:</p>
+	 *
+	 * <listing version="3.0">
+	 * var list:PickerList = new PickerList();
+	 *
+	 * list.dataProvider = new ListCollection(
+	 * [
+	 *     { text: "Milk", thumbnail: textureAtlas.getTexture( "milk" ) },
+	 *     { text: "Eggs", thumbnail: textureAtlas.getTexture( "eggs" ) },
+	 *     { text: "Bread", thumbnail: textureAtlas.getTexture( "bread" ) },
+	 *     { text: "Chicken", thumbnail: textureAtlas.getTexture( "chicken" ) },
+	 * ]);
+	 *
+	 * list.listProperties.itemRendererFactory = function():IListItemRenderer
+	 * {
+	 *     var renderer:DefaultListItemRenderer = new DefaultListItemRenderer();
+	 *     renderer.labelField = "text";
+	 *     renderer.iconSourceField = "thumbnail";
+	 *     return renderer;
+	 * };
+	 *
+	 * list.addEventListener( Event.CHANGE, list_changeHandler );
+	 *
+	 * this.addChild( list );</listing>
+	 *
 	 * @see http://wiki.starling-framework.org/feathers/picker-list
 	 */
 	public class PickerList extends FeathersControl
 	{
 		/**
 		 * The default value added to the <code>nameList</code> of the button.
+		 *
+		 * @see feathers.core.IFeathersControl#nameList
 		 */
 		public static const DEFAULT_CHILD_NAME_BUTTON:String = "feathers-picker-list-button";
 
 		/**
 		 * The default value added to the <code>nameList</code> of the pop-up
 		 * list.
+		 *
+		 * @see feathers.core.IFeathersControl#nameList
 		 */
 		public static const DEFAULT_CHILD_NAME_LIST:String = "feathers-picker-list-list";
 
@@ -68,6 +84,32 @@ package feathers.controls
 		 * @private
 		 */
 		private static const HELPER_TOUCHES_VECTOR:Vector.<Touch> = new <Touch>[];
+
+		/**
+		 * @private
+		 */
+		protected static const INVALIDATION_FLAG_BUTTON_FACTORY:String = "buttonFactory";
+
+		/**
+		 * @private
+		 */
+		protected static const INVALIDATION_FLAG_LIST_FACTORY:String = "listFactory";
+
+		/**
+		 * @private
+		 */
+		protected static function defaultButtonFactory():Button
+		{
+			return new Button();
+		}
+
+		/**
+		 * @private
+		 */
+		protected static function defaultListFactory():List
+		{
+			return new List();
+		}
 
 		/**
 		 * Constructor.
@@ -79,12 +121,30 @@ package feathers.controls
 		}
 
 		/**
-		 * The value added to the <code>nameList</code> of the button.
+		 * The default value added to the <code>nameList</code> of the button. This
+		 * variable is <code>protected</code> so that sub-classes can customize
+		 * the button name in their constructors instead of using the default
+		 * name defined by <code>DEFAULT_CHILD_NAME_BUTTON</code>.
+		 *
+		 * <p>To customize the button name without subclassing, see
+		 * <code>customButtonName</code>.</p>
+		 *
+		 * @see #customButtonName
+		 * @see feathers.core.IFeathersControl#nameList
 		 */
 		protected var buttonName:String = DEFAULT_CHILD_NAME_BUTTON;
 
 		/**
-		 * The value added to the <code>nameList</code> of the pop-up list.
+		 * The default value added to the <code>nameList</code> of the pop-up list. This
+		 * variable is <code>protected</code> so that sub-classes can customize
+		 * the list name in their constructors instead of using the default
+		 * name defined by <code>DEFAULT_CHILD_NAME_LIST</code>.
+		 *
+		 * <p>To customize the pop-up list name without subclassing, see
+		 * <code>customListName</code>.</p>
+		 *
+		 * @see #customListName
+		 * @see feathers.core.IFeathersControl#nameList
 		 */
 		protected var listName:String = DEFAULT_CHILD_NAME_LIST;
 
@@ -119,7 +179,29 @@ package feathers.controls
 		protected var _dataProvider:ListCollection;
 		
 		/**
-		 * @copy List#dataProvider
+		 * The collection of data displayed by the list.
+		 *
+		 * <p>The following example passes in a data provider and tells the item
+		 * renderer how to interpret the data:</p>
+		 *
+		 * <listing version="3.0">
+		 * list.dataProvider = new ListCollection(
+		 * [
+		 *     { text: "Milk", thumbnail: textureAtlas.getTexture( "milk" ) },
+		 *     { text: "Eggs", thumbnail: textureAtlas.getTexture( "eggs" ) },
+		 *     { text: "Bread", thumbnail: textureAtlas.getTexture( "bread" ) },
+		 *     { text: "Chicken", thumbnail: textureAtlas.getTexture( "chicken" ) },
+		 * ]);
+		 *
+		 * list.listProperties.itemRendererFactory = function():IListItemRenderer
+		 * {
+		 *     var renderer:DefaultListItemRenderer = new DefaultListItemRenderer();
+		 *     renderer.labelField = "text";
+		 *     renderer.iconSourceField = "thumbnail";
+		 *     return renderer;
+		 * };</listing>
+		 *
+		 * @default null
 		 */
 		public function get dataProvider():ListCollection
 		{
@@ -153,7 +235,36 @@ package feathers.controls
 		protected var _selectedIndex:int = -1;
 		
 		/**
-		 * @copy List#selectedIndex
+		 * The index of the currently selected item. Returns <code>-1</code> if
+		 * no item is selected.
+		 *
+		 * <p>The following example selects an item by its index:</p>
+		 *
+		 * <listing version="3.0">
+		 * list.selectedIndex = 2;</listing>
+		 *
+		 * <p>The following example clears the selected index:</p>
+		 *
+		 * <listing version="3.0">
+		 * list.selectedIndex = -1;</listing>
+		 *
+		 * <p>The following example listens for when selection changes and
+		 * requests the selected index:</p>
+		 *
+		 * <listing version="3.0">
+		 * function list_changeHandler( event:Event ):void
+		 * {
+		 *     var list:PickerList = PickerList( event.currentTarget );
+		 *     var index:int = list.selectedIndex;
+		 *
+		 * }
+		 * list.addEventListener( Event.CHANGE, list_changeHandler );</listing>
+		 *
+		 * @default -1
+		 *
+		 * @see #selectedItem
+		 *
+		 * @see #selectedItem
 		 */
 		public function get selectedIndex():int
 		{
@@ -175,7 +286,36 @@ package feathers.controls
 		}
 		
 		/**
-		 * @copy List#selectedItem
+		 * The currently selected item. Returns <code>null</code> if no item is
+		 * selected.
+		 *
+		 * <p>The following example changes the selected item:</p>
+		 *
+		 * <listing version="3.0">
+		 * list.selectedItem = list.dataProvider.getItemAt(0);</listing>
+		 *
+		 * <p>The following example clears the selected item:</p>
+		 *
+		 * <listing version="3.0">
+		 * list.selectedItem = null;</listing>
+		 *
+		 * <p>The following example listens for when selection changes and
+		 * requests the selected item:</p>
+		 *
+		 * <listing version="3.0">
+		 * function list_changeHandler( event:Event ):void
+		 * {
+		 *     var list:PickerList = PickerList( event.currentTarget );
+		 *     var item:Object = list.selectedItem;
+		 *
+		 * }
+		 * list.addEventListener( Event.CHANGE, list_changeHandler );</listing>
+		 *
+		 * @default null
+		 *
+		 * @see #selectedIndex
+		 *
+		 * @see #selectedIndex
 		 */
 		public function get selectedItem():Object
 		{
@@ -199,6 +339,42 @@ package feathers.controls
 			
 			this.selectedIndex = this._dataProvider.getItemIndex(value);
 		}
+
+		/**
+		 * @private
+		 */
+		protected var _prompt:String;
+
+		/**
+		 * Text displayed by the button sub-component when no items are
+		 * currently selected.
+		 *
+		 * <p>In the following example, a prompt is given to the picker list
+		 * and the selected item is cleared to display the prompt:</p>
+		 *
+		 * <listing version="3.0">
+		 * list.prompt = "Select an Item";
+		 * list.selectedIndex = -1;</listing>
+		 *
+		 * @default null
+		 */
+		public function get prompt():String
+		{
+			return this._prompt;
+		}
+
+		/**
+		 * @private
+		 */
+		public function set prompt(value:String):void
+		{
+			if(this._prompt == value)
+			{
+				return;
+			}
+			this._prompt = value;
+			this.invalidate(INVALIDATION_FLAG_SELECTED);
+		}
 		
 		/**
 		 * @private
@@ -217,6 +393,13 @@ package feathers.controls
 		 * <p><strong>Important:</strong> This value only affects the selected
 		 * item displayed by the picker list's button control. It will <em>not</em>
 		 * affect the label text of the pop-up list's item renderers.</p>
+		 *
+		 * <p>In the following example, the label field is changed:</p>
+		 *
+		 * <listing version="3.0">
+		 * list.labelField = "text";</listing>
+		 *
+		 * @default "label"
 		 *
 		 * @see #labelFunction
 		 */
@@ -253,6 +436,25 @@ package feathers.controls
 		 * item displayed by the picker list's button control. It will <em>not</em>
 		 * affect the label text of the pop-up list's item renderers.</p>
 		 *
+		 * <p>The function is expected to have the following signature:</p>
+		 * <pre>function( item:Object ):String</pre>
+		 *
+		 * <p>All of the label fields and functions, ordered by priority:</p>
+		 * <ol>
+		 *     <li><code>labelFunction</code></li>
+		 *     <li><code>labelField</code></li>
+		 * </ol>
+		 *
+		 * <p>In the following example, the label field is changed:</p>
+		 *
+		 * <listing version="3.0">
+		 * list.labelFunction = function( item:Object ):String
+		 * {
+		 *     return item.firstName + " " + item.lastName;
+		 * };</listing>
+		 *
+		 * @default null
+		 *
 		 * @see #labelField
 		 */
 		public function get labelFunction():Function
@@ -276,6 +478,13 @@ package feathers.controls
 		
 		/**
 		 * A manager that handles the details of how to display the pop-up list.
+		 *
+		 * <p>In the following example, a pop-up content manager is provided:</p>
+		 *
+		 * <listing version="3.0">
+		 * list.popUpContentManager = new CalloutPopUpContentManager();</listing>
+		 *
+		 * @default null
 		 */
 		public function get popUpContentManager():IPopUpContentManager
 		{
@@ -314,6 +523,15 @@ package feathers.controls
 		 * Used to auto-size the list. If the list's width or height is NaN, the
 		 * list will try to automatically pick an ideal size. This item is
 		 * used in that process to create a sample item renderer.
+		 *
+		 * <p>The following example provides a typical item:</p>
+		 *
+		 * <listing version="3.0">
+		 * list.typicalItem = { text: "A typical item", thumbnail: texture };
+		 * list.itemRendererProperties.labelField = "text";
+		 * list.itemRendererProperties.iconSourceField = "thumbnail";</listing>
+		 *
+		 * @default null
 		 */
 		public function get typicalItem():Object
 		{
@@ -332,6 +550,100 @@ package feathers.controls
 			this._typicalItem = value;
 			this.invalidate(INVALIDATION_FLAG_STYLES);
 		}
+
+		/**
+		 * @private
+		 */
+		protected var _buttonFactory:Function;
+
+		/**
+		 * A function used to generate the picker list's button sub-component.
+		 * The button must be an instance of <code>Button</code>. This factory
+		 * can be used to change properties on the button when it is first
+		 * created. For instance, if you are skinning Feathers components
+		 * without a theme, you might use this factory to set skins and other
+		 * styles on the button.
+		 *
+		 * <p>The function should have the following signature:</p>
+		 * <pre>function():Button</pre>
+		 *
+		 * <p>In the following example, a custom button factory is passed to the
+		 * picker list:</p>
+		 *
+		 * <listing version="3.0">
+		 * list.buttonFactory = function():Button
+		 * {
+		 *     var button:Button = new Button();
+		 *     button.defaultSkin = new Image( upTexture );
+		 *     button.downSkin = new Image( downTexture );
+		 *     return button;
+		 * };</listing>
+		 *
+		 * @see feathers.controls.Button
+		 * @see #buttonProperties
+		 */
+		public function get buttonFactory():Function
+		{
+			return this._buttonFactory;
+		}
+
+		/**
+		 * @private
+		 */
+		public function set buttonFactory(value:Function):void
+		{
+			if(this._buttonFactory == value)
+			{
+				return;
+			}
+			this._buttonFactory = value;
+			this.invalidate(INVALIDATION_FLAG_BUTTON_FACTORY);
+		}
+
+		/**
+		 * @private
+		 */
+		protected var _customButtonName:String;
+
+		/**
+		 * A name to add to the picker list's button sub-component. Typically
+		 * used by a theme to provide different skins to different picker lists.
+		 *
+		 * <p>In the following example, a custom button name is passed to the
+		 * picker list:</p>
+		 *
+		 * <listing version="3.0">
+		 * list.customButtonName = "my-custom-button";</listing>
+		 *
+		 * <p>In your theme, you can target this sub-component name to provide
+		 * different skins than the default style:</p>
+		 *
+		 * <listing version="3.0">
+		 * setInitializerForClass( Button, customButtonInitializer, "my-custom-button");</listing>
+		 *
+		 * @see #DEFAULT_CHILD_NAME_BUTTON
+		 * @see feathers.core.FeathersControl#nameList
+		 * @see feathers.core.DisplayListWatcher
+		 * @see #buttonFactory
+		 * @see #buttonProperties
+		 */
+		public function get customButtonName():String
+		{
+			return this._customButtonName;
+		}
+
+		/**
+		 * @private
+		 */
+		public function set customButtonName(value:String):void
+		{
+			if(this._customButtonName == value)
+			{
+				return;
+			}
+			this._customButtonName = value;
+			this.invalidate(INVALIDATION_FLAG_BUTTON_FACTORY);
+		}
 		
 		/**
 		 * @private
@@ -341,7 +653,7 @@ package feathers.controls
 		/**
 		 * A set of key/value pairs to be passed down to the picker's button
 		 * sub-component. It is a <code>feathers.controls.Button</code>
-		 * instance.
+		 * instance that is created by <code>buttonFactory</code>.
 		 *
 		 * <p>If the subcomponent has its own subcomponents, their properties
 		 * can be set too, using attribute <code>&#64;</code> notation. For example,
@@ -349,7 +661,19 @@ package feathers.controls
 		 * which is in a <code>Scroller</code> which is in a <code>List</code>,
 		 * you can use the following syntax:</p>
 		 * <pre>list.scrollerProperties.&#64;verticalScrollBarProperties.&#64;thumbProperties.defaultSkin = new Image(texture);</pre>
-		 * 
+		 *
+		 * <p>Setting properties in a <code>buttonFactory</code> function
+		 * instead of using <code>buttonProperties</code> will result in better
+		 * performance.</p>
+		 *
+		 * <p>In the following example, the button properties are passed to the
+		 * picker list:</p>
+		 *
+		 * <listing version="3.0">
+		 * list.buttonProperties.defaultSkin = new Image( upTexture );
+		 * list.buttonProperties.downSkin = new Image( downTexture );</listing>
+		 *
+		 * @see #buttonFactory
 		 * @see feathers.controls.Button
 		 */
 		public function get buttonProperties():Object
@@ -394,6 +718,99 @@ package feathers.controls
 			}
 			this.invalidate(INVALIDATION_FLAG_STYLES);
 		}
+
+		/**
+		 * @private
+		 */
+		protected var _listFactory:Function;
+
+		/**
+		 * A function used to generate the picker list's pop-up list
+		 * sub-component. The list must be an instance of <code>List</code>.
+		 * This factory can be used to change properties on the list when it is
+		 * first created. For instance, if you are skinning Feathers components
+		 * without a theme, you might use this factory to set skins and other
+		 * styles on the list.
+		 *
+		 * <p>The function should have the following signature:</p>
+		 * <pre>function():List</pre>
+		 *
+		 * <p>In the following example, a custom list factory is passed to the
+		 * picker list:</p>
+		 *
+		 * <listing version="3.0">
+		 * list.listFactory = function():List
+		 * {
+		 *     var popUpList:List = new List();
+		 *     popUpList.backgroundSkin = new Image( texture );
+		 *     return popUpList;
+		 * };</listing>
+		 *
+		 * @see feathers.controls.List
+		 * @see #listProperties
+		 */
+		public function get listFactory():Function
+		{
+			return this._listFactory;
+		}
+
+		/**
+		 * @private
+		 */
+		public function set listFactory(value:Function):void
+		{
+			if(this._listFactory == value)
+			{
+				return;
+			}
+			this._listFactory = value;
+			this.invalidate(INVALIDATION_FLAG_LIST_FACTORY);
+		}
+
+		/**
+		 * @private
+		 */
+		protected var _customListName:String;
+
+		/**
+		 * A name to add to the picker list's list sub-component. Typically used
+		 * by a theme to provide different skins to different picker lists.
+		 *
+		 * <p>In the following example, a custom list name is passed to the
+		 * picker list:</p>
+		 *
+		 * <listing version="3.0">
+		 * list.customListName = "my-custom-list";</listing>
+		 *
+		 * <p>In your theme, you can target this sub-component name to provide
+		 * different skins than the default style:</p>
+		 *
+		 * <listing version="3.0">
+		 * setInitializerForClass( List, customListInitializer, "my-custom-list");</listing>
+		 *
+		 * @see #DEFAULT_CHILD_NAME_LIST
+		 * @see feathers.core.FeathersControl#nameList
+		 * @see feathers.core.DisplayListWatcher
+		 * @see #listFactory
+		 * @see #listProperties
+		 */
+		public function get customListName():String
+		{
+			return this._customListName;
+		}
+
+		/**
+		 * @private
+		 */
+		public function set customListName(value:String):void
+		{
+			if(this._customListName == value)
+			{
+				return;
+			}
+			this._customListName = value;
+			this.invalidate(INVALIDATION_FLAG_LIST_FACTORY);
+		}
 		
 		/**
 		 * @private
@@ -403,7 +820,8 @@ package feathers.controls
 		/**
 		 * A set of key/value pairs to be passed down to the picker's pop-up
 		 * list sub-component. The pop-up list is a
-		 * <code>feathers.controls.List</code> instance.
+		 * <code>feathers.controls.List</code> instance that is created by
+		 * <code>listFactory</code>.
 		 *
 		 * <p>If the subcomponent has its own subcomponents, their properties
 		 * can be set too, using attribute <code>&#64;</code> notation. For example,
@@ -411,7 +829,18 @@ package feathers.controls
 		 * which is in a <code>Scroller</code> which is in a <code>List</code>,
 		 * you can use the following syntax:</p>
 		 * <pre>list.scrollerProperties.&#64;verticalScrollBarProperties.&#64;thumbProperties.defaultSkin = new Image(texture);</pre>
-		 * 
+		 *
+		 * <p>Setting properties in a <code>listFactory</code> function
+		 * instead of using <code>listProperties</code> will result in better
+		 * performance.</p>
+		 *
+		 * <p>In the following example, the list properties are passed to the
+		 * picker list:</p>
+		 *
+		 * <listing version="3.0">
+		 * list.listProperties.backgroundSkin = new Image( texture );</listing>
+		 *
+		 * @see #listFactory
 		 * @see feathers.controls.List
 		 */
 		public function get listProperties():Object
@@ -498,24 +927,6 @@ package feathers.controls
 		 */
 		override protected function initialize():void
 		{
-			if(!this.button)
-			{
-				this.button = new Button();
-				this.button.nameList.add(this.buttonName);
-				this.button.addEventListener(Event.TRIGGERED, button_triggeredHandler);
-				this.button.addEventListener(TouchEvent.TOUCH, button_touchHandler);
-				this.addChild(this.button);
-			}
-			
-			if(!this.list)
-			{
-				this.list = new List();
-				this.list.nameList.add(this.listName);
-				this.list.addEventListener(Event.SCROLL, list_scrollHandler);
-				this.list.addEventListener(Event.CHANGE, list_changeHandler);
-				this.list.addEventListener(TouchEvent.TOUCH, list_touchHandler);
-			}
-
 			if(!this._popUpContentManager)
 			{
 				if(DeviceCapabilities.isTablet(Starling.current.nativeStage))
@@ -540,8 +951,20 @@ package feathers.controls
 			const stateInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_STATE);
 			const selectionInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_SELECTED);
 			var sizeInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_SIZE);
+			const buttonFactoryInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_BUTTON_FACTORY);
+			const listFactoryInvalid:Boolean = this.isInvalid(INVALIDATION_FLAG_LIST_FACTORY);
+
+			if(buttonFactoryInvalid)
+			{
+				this.createButton();
+			}
+
+			if(listFactoryInvalid)
+			{
+				this.createList();
+			}
 			
-			if(stylesInvalid || selectionInvalid)
+			if(buttonFactoryInvalid || stylesInvalid || selectionInvalid)
 			{
 				//this section asks the button to auto-size again, if our
 				//explicit dimensions aren't set.
@@ -557,35 +980,45 @@ package feathers.controls
 				}
 			}
 
-			if(stylesInvalid)
+			if(buttonFactoryInvalid || stylesInvalid)
 			{
 				this._typicalItemWidth = NaN;
 				this._typicalItemHeight = NaN;
 				this.refreshButtonProperties();
+			}
+
+			if(listFactoryInvalid || stylesInvalid)
+			{
 				this.refreshListProperties();
 			}
 			
-			if(dataInvalid)
+			if(listFactoryInvalid || dataInvalid)
 			{
 				this.list.dataProvider = this._dataProvider;
 				this._hasBeenScrolled = false;
 			}
 			
-			if(stateInvalid)
+			if(buttonFactoryInvalid || listFactoryInvalid || stateInvalid)
 			{
-				this.button.isEnabled = this.isEnabled;
+				this.button.isEnabled = this._isEnabled;
+				this.list.isEnabled = this._isEnabled;
 			}
 
-			if(selectionInvalid)
+			if(buttonFactoryInvalid || selectionInvalid)
 			{
 				this.refreshButtonLabel();
+			}
+			if(listFactoryInvalid || selectionInvalid)
+			{
 				this.list.selectedIndex = this._selectedIndex;
 			}
 
 			sizeInvalid = this.autoSizeIfNeeded() || sizeInvalid;
 
-			this.button.width = this.actualWidth;
-			this.button.height = this.actualHeight;
+			if(buttonFactoryInvalid || sizeInvalid || selectionInvalid)
+			{
+				this.layout();
+			}
 		}
 
 		/**
@@ -632,6 +1065,48 @@ package feathers.controls
 			}
 			return this.setSizeInternal(newWidth, newHeight, false);
 		}
+
+		/**
+		 * @private
+		 */
+		protected function createButton():void
+		{
+			if(this.button)
+			{
+				this.button.removeFromParent(true);
+				this.button = null;
+			}
+
+			const factory:Function = this._buttonFactory != null ? this._buttonFactory : defaultButtonFactory;
+			const buttonName:String = this._customButtonName != null ? this._customButtonName : this.buttonName;
+			this.button = Button(factory());
+			this.button.nameList.add(buttonName);
+			this.button.addEventListener(Event.TRIGGERED, button_triggeredHandler);
+			this.button.addEventListener(TouchEvent.TOUCH, button_touchHandler);
+			this.addChild(this.button);
+		}
+
+		/**
+		 * @private
+		 */
+		protected function createList():void
+		{
+			if(this.list)
+			{
+				this.list.removeFromParent(false);
+				//disposing separately because the list may not have a parent
+				this.list.dispose();
+				this.list = null;
+			}
+
+			const factory:Function = this._listFactory != null ? this._listFactory : defaultListFactory;
+			const listName:String = this._customListName != null ? this._customListName : this.listName;
+			this.list = List(factory());
+			this.list.nameList.add(listName);
+			this.list.addEventListener(Event.SCROLL, list_scrollHandler);
+			this.list.addEventListener(Event.CHANGE, list_changeHandler);
+			this.list.addEventListener(TouchEvent.TOUCH, list_touchHandler);
+		}
 		
 		/**
 		 * @private
@@ -644,7 +1119,7 @@ package feathers.controls
 			}
 			else
 			{
-				this.button.label = "";
+				this.button.label = this._prompt;
 			}
 		}
 		
@@ -676,6 +1151,15 @@ package feathers.controls
 					this.list[propertyName] = propertyValue;
 				}
 			}
+		}
+
+		/**
+		 * @private
+		 */
+		protected function layout():void
+		{
+			this.button.width = this.actualWidth;
+			this.button.height = this.actualHeight;
 		}
 		
 		/**
@@ -826,7 +1310,17 @@ package feathers.controls
 				{
 					if(!this._hasBeenScrolled)
 					{
-						this.closePopUpList();
+						var target:DisplayObject = DisplayObject(event.target);
+						do
+						{
+							if(target is IListItemRenderer)
+							{
+								this.closePopUpList();
+								break;
+							}
+							target = target.parent;
+						}
+						while(target)
 					}
 					this._listTouchPointID = -1;
 				}

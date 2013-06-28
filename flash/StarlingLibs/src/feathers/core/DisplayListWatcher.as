@@ -1,26 +1,9 @@
 /*
-Copyright 2012-2013 Joshua Tynjala
+Feathers
+Copyright 2012-2013 Joshua Tynjala. All Rights Reserved.
 
-Permission is hereby granted, free of charge, to any person
-obtaining a copy of this software and associated documentation
-files (the "Software"), to deal in the Software without
-restriction, including without limitation the rights to use,
-copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the
-Software is furnished to do so, subject to the following
-conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-OTHER DEALINGS IN THE SOFTWARE.
+This program is free software. You can redistribute and/or modify it in
+accordance with the terms of the accompanying license agreement.
 */
 package feathers.core
 {
@@ -32,24 +15,55 @@ package feathers.core
 
 	/**
 	 * Watches a container on the display list. As new display objects are
-	 * added, if they match a specific type, they will be passed to initializer
+	 * added, and if they match a specific type, they will be passed to initializer
 	 * functions to set properties, call methods, or otherwise modify them.
 	 * Useful for initializing skins and styles on UI controls.
-	 * 
-	 * <p>If a display object matches multiple types that have initializers, and
-	 * <code>exactTypeMatching</code> is disabled, the initializers will be
-	 * executed in order following the inheritance chain.</p>
+	 *
+	 * <p>In the example below, the <code>buttonInitializer()</code> function
+	 * will be called when a <code>Button</code> is added to the display list:</p>
+	 *
+	 * <listing version="3.0">
+	 * setInitializerForClass(Button, buttonInitializer);</listing>
+	 *
+	 * <p>However, initializers are not called for subclasses. If a
+	 * <code>Check</code> is added to the display list (<code>Check</code>
+	 * extends <code>Button</code>), the <code>buttonInitializer()</code>
+	 * function will not be called. This important restriction allows subclasses
+	 * to have different skins, for instance.</p>
+	 *
+	 * <p>You can target a specific subclass with the same initializer function
+	 * without adding it for all subclasses:</p>
+	 *
+	 * <listing version="3.0">
+	 * setInitializerForClass(Button, buttonInitializer);
+	 * setInitializerForClass(Check, buttonInitializer);</listing>
+	 *
+	 * <p>In this case, <code>Button</code> and <code>Check</code> will trigger
+	 * the <code>buttonInitializer()</code> function, but <code>Radio</code>
+	 * (another subclass of <code>Button</code>) will not.</p>
+	 *
+	 * <p>You can target a class and all of its subclasses, using a different
+	 * function. This is recommended only when you are absolutely sure that
+	 * no subclasses will need a separate initializer.</p>
+	 *
+	 * <listing version="3.0">
+	 * setInitializerForClassAndSubclasses(Button, buttonInitializer);</listing>
+	 *
+	 * <p>In this case, <code>Button</code>, <code>Check</code>, <code>Radio</code>
+	 * and every other subclass of <code>Button</code> (including any subclasses
+	 * that you create yourself) will trigger the <code>buttonInitializer()</code>
+	 * function.</p>
 	 */
 	public class DisplayListWatcher
 	{
 		/**
 		 * Constructor.
 		 *
-		 * @param root		The root display object to watch (not necessarily Starling's root object)
+		 * @param topLevelContainer		The root display object to watch (not necessarily Starling's root object)
 		 */
-		public function DisplayListWatcher(root:DisplayObjectContainer)
+		public function DisplayListWatcher(topLevelContainer:DisplayObjectContainer)
 		{
-			this.root = root;
+			this.root = topLevelContainer;
 			this.root.addEventListener(Event.ADDED, addedHandler);
 		}
 		
@@ -132,6 +146,11 @@ package feathers.core
 		protected var _initializerSuperTypes:Vector.<Class> = new <Class>[];
 
 		/**
+		 * @private
+		 */
+		protected var _excludedObjects:Vector.<DisplayObject>;
+
+		/**
 		 * Stops listening to the root and cleans up anything else that needs to
 		 * be disposed. If a <code>DisplayListWatcher</code> is extended for a
 		 * theme, it should also dispose textures and other assets.
@@ -143,6 +162,70 @@ package feathers.core
 				this.root.removeEventListener(Event.ADDED, addedHandler);
 				this.root = null;
 			}
+			if(this._excludedObjects)
+			{
+				this._excludedObjects.length = 0;
+				this._excludedObjects = null;
+			}
+			for(var key:Object in this.initializedObjects)
+			{
+				delete this.initializedObjects[key];
+			}
+			for(key in this._initializerNameTypeMap)
+			{
+				delete this._initializerNameTypeMap[key];
+			}
+			for(key in this._initializerNoNameTypeMap)
+			{
+				delete this._initializerNoNameTypeMap[key];
+			}
+			for(key in this._initializerSuperTypeMap)
+			{
+				delete this._initializerSuperTypeMap[key];
+			}
+			this._initializerSuperTypes.length = 0;
+		}
+
+		/**
+		 * Excludes a display object, and all if its children (if any) from
+		 * being watched.
+		 */
+		public function exclude(target:DisplayObject):void
+		{
+			if(!this._excludedObjects)
+			{
+				this._excludedObjects = new <DisplayObject>[];
+			}
+			this._excludedObjects.push(target);
+		}
+
+		/**
+		 * Determines if an object is excluded from being watched.
+		 */
+		public function isExcluded(target:DisplayObject):Boolean
+		{
+			if(!this._excludedObjects)
+			{
+				return false;
+			}
+
+			const objectCount:int = this._excludedObjects.length;
+			for(var i:int = 0; i < objectCount; i++)
+			{
+				var object:DisplayObject = this._excludedObjects[i];
+				if(object is DisplayObjectContainer)
+				{
+					if(DisplayObjectContainer(object).contains(target))
+					{
+						return true;
+					}
+				}
+				else if(object == target)
+				{
+					return true;
+				}
+			}
+			return false;
 		}
 		
 		/**
@@ -303,6 +386,11 @@ package feathers.core
 				const isInitialized:Boolean = this._initializeOnce && this.initializedObjects[targetAsRequiredBaseClass];
 				if(!isInitialized)
 				{
+					if(this.isExcluded(target))
+					{
+						return;
+					}
+
 					this.initializedObjects[targetAsRequiredBaseClass] = true;
 					this.processAllInitializers(target);
 				}

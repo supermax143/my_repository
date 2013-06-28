@@ -3,7 +3,7 @@
 			   xmlns:s="library://ns.adobe.com/flex/spark" 
 			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600"
 			   xmlns:local="*" 
-			   addedToStage="init()" frameRate="30"
+			   addedToStage="init()" frameRate="60"
 			   backgroundColor="0x666666">
 	<fx:Script>
 		<![CDATA[

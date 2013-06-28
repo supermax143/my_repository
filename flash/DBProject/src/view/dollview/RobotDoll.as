@@ -8,6 +8,8 @@ package view.dollview
 	import gameModel.RobotModel;
 	import gameModel.VisualRobotModel;
 	
+	import mx.collections.ArrayCollection;
+	
 	import resources.ResourceManager;
 	
 	import view.dollview.events.DollEvent;
@@ -97,12 +99,23 @@ package view.dollview
 				partsManagerUpdatedHandler();
 		}
 		
-		public function showEffectAnimation():void
+		public function showEffectAnimation(animationId:String):void
 		{
-			playAnimation(skillsArmarure,'heal',true);
 			currentArmature = skillsArmarure;
+			playAnimation(skillsArmarure,animationId,true);
 			//_currentArmature.animation.gotoAndPlay('heal');
 		}
+		
+		public function getEffectsList():ArrayCollection
+		{
+			var arr:ArrayCollection = new ArrayCollection();
+			if(!atackArmature)
+				return new ArrayCollection();
+			for each (var skill:String in skillsArmarure.animation.movementList) 
+				arr.addItem(skill);
+			return arr;	
+		}
+		
 		
 		private function partsManagerUpdatedHandler(event:Event=null):void
 		{

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<application xmlns="http://ns.adobe.com/air/application/3.1">
+	<id>com.feathersui.examples.TrainTimes</id>
+	<filename>Train Times</filename>
+	<name>Train Times</name>
+	<versionNumber>1.1.0</versionNumber>
+	<description>Train Times example application built with Feathers UI controls for Starling</description>
+	<copyright>2013 Josh Tynjala</copyright>
+
+	<initialWindow>
+		<content>TrainTimes.swf</content>
+		<autoOrients>true</autoOrients>
+		<fullScreen>true</fullScreen>
+		<visible>true</visible>
+		<renderMode>direct</renderMode>
+	</initialWindow>
+
+	
+
+	
+	<android>
+		<manifestAdditions><![CDATA[
+			<manifest android:installLocation="auto">
+			    <uses-permission android:name="android.permission.INTERNET"/>
+			</manifest>
+		]]></manifestAdditions>
+	</android>
+	<iPhone>
+		<InfoAdditions>
+			<![CDATA[
+			<key>UIDeviceFamily</key>
+			<array>
+				<string>1</string>
+				<string>2</string>
+			</array>
+			<key>UIPrerenderedIcon</key>
+			<true/>
+		]]>
+		</InfoAdditions>
+		<requestedDisplayResolution>high</requestedDisplayResolution>
+	</iPhone>
+</application>
