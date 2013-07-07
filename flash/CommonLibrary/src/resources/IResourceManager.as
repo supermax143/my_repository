@@ -27,6 +27,5 @@ public interface IResourceManager {
 	function getSound(name:String, clearMemory:Boolean):Sound
 	
 	function getLoadingItem(id:String):LoadingItem
-	function addLoadingItem(id:String,props:Object=null):LoadingItem	
 }
 }

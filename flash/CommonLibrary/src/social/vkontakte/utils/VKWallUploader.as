@@ -141,7 +141,7 @@ public class VKWallUploader extends EventDispatcher
 		var params:Object = new Object();
 		params.owner_id = userId;
 		params.message = text;
-		var attachment:String = photoId;
+		var attachment:String = photoId + ",http://vk.com/robostory";
 		
 		params.attachment = attachment;
 		apiConnector.api('wall.post',params);

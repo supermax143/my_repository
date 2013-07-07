@@ -102,7 +102,7 @@ package com.rafaelrinaldi.data.list
 		 */
 		public function merge( p_list : List ) : void
 		{
-			var item : ListItem;
+			var item : GuiListItem;
 			var list : List;
 			var dictionary : Dictionary;
 			
@@ -152,9 +152,9 @@ package com.rafaelrinaldi.data.list
 			}
 			
 			if(!allowOverride) {
-				if(!items.hasOwnProperty(p_id)) items[p_id] = new ListItem(p_id, p_value);
+				if(!items.hasOwnProperty(p_id)) items[p_id] = new GuiListItem(p_id, p_value);
 			} else {
-				items[p_id] = new ListItem(p_id, p_value);
+				items[p_id] = new GuiListItem(p_id, p_value);
 			}
 			
 			if(ids.indexOf(p_id) < 0) ids.push(p_id);
@@ -170,7 +170,7 @@ package com.rafaelrinaldi.data.list
 		public function remove( p_id : String ) : List
 		{
 			if(items.hasOwnProperty(p_id)) {
-				ListItem(items[p_id]).dispose(); // Try to clean the object.
+				GuiListItem(items[p_id]).dispose(); // Try to clean the object.
 				delete items[p_id]; // Remove Dictionary reference.
 				
 				// Removing id from ids list.
@@ -226,7 +226,7 @@ package com.rafaelrinaldi.data.list
 			hasId = items.hasOwnProperty(p_query);
 			
 			for(var id : String in items) {
-				hasValue = (items[id] as ListItem).match(p_query);
+				hasValue = (items[id] as GuiListItem).match(p_query);
 				if(hasValue) break;
 			}
 			
@@ -271,7 +271,7 @@ package com.rafaelrinaldi.data.list
 		public function toListString() : String
 		{
 			var stack : String;
-			var item : ListItem;
+			var item : GuiListItem;
 			var list : List;
 			
 			stack = id;

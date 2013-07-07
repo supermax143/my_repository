@@ -1,7 +1,7 @@
 package com.rafaelrinaldi.sound
 {
 	import com.rafaelrinaldi.data.list.List;
-	import com.rafaelrinaldi.data.list.ListItem;
+	import com.rafaelrinaldi.data.list.GuiListItem;
 
 	import flash.display.InteractiveObject;
 	import flash.media.Sound;
@@ -140,7 +140,7 @@ package com.rafaelrinaldi.sound
 		/** Stop list items. **/
 		override public function stop() : SoundControl
 		{
-			for each(var item : ListItem in list.items) (item.value as SoundItem).stop();
+			for each(var item : GuiListItem in list.items) (item.value as SoundItem).stop();
 			return super.stop();
 		}
 
@@ -151,14 +151,14 @@ package com.rafaelrinaldi.sound
 		 */
 		override public function play( p_loops : int = 0, p_delay : int = 0 ) : SoundControl
 		{
-			for each(var item : ListItem in list.items) (item.value as SoundItem).play(p_loops, p_delay);
+			for each(var item : GuiListItem in list.items) (item.value as SoundItem).play(p_loops, p_delay);
 			return super.play();
 		}
 		
 		/** Pause list items. **/
 		override public function pause() : SoundControl
 		{
-			for each(var item : ListItem in list.items) (item.value as SoundItem).pause();
+			for each(var item : GuiListItem in list.items) (item.value as SoundItem).pause();
 			return super.pause();
 		}
 		
@@ -178,7 +178,7 @@ package com.rafaelrinaldi.sound
 		/** List volume setter. **/
 		override public function set volume( value : Number ) : void
 		{
-			for each(var item : ListItem in list.items) (item.value as SoundItem).volume = value;
+			for each(var item : GuiListItem in list.items) (item.value as SoundItem).volume = value;
 		}
 		
 		/** @return List pan. **/
@@ -190,7 +190,7 @@ package com.rafaelrinaldi.sound
 		/** List pan setter. **/
 		override public function set pan( value : Number ) : void
 		{
-			for each(var item : ListItem in list.items) (item.value as SoundItem).pan = value;
+			for each(var item : GuiListItem in list.items) (item.value as SoundItem).pan = value;
 		}
 
 		/** Clear from memory. **/

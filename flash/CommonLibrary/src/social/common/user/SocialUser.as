@@ -28,6 +28,7 @@ public class SocialUser implements IVKUser,IMWUser
     private var _nickname:String;
     private var _label:String;
     private var _language:String;
+	private var _age:int;
     
     private var _sex:int;
     private var _isMale:Boolean;
@@ -125,6 +126,7 @@ public class SocialUser implements IVKUser,IMWUser
      	object.balance = balance;
      	object.label = label;
      	object.language = language;
+		object.age = age;
      	return object;
     }
     //--------------------------------------------------------------------------
@@ -189,6 +191,14 @@ public class SocialUser implements IVKUser,IMWUser
     {
         _language = value;
     }
+	
+	public function set age(value:int):void {
+		_age = value;
+	}
+	
+	public function get age():int {
+		return _age;
+	}
 
     public function get lastName():String
     {

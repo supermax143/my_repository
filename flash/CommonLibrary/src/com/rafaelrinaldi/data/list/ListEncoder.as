@@ -18,7 +18,7 @@ package com.rafaelrinaldi.data.list
 		 */
 		public static function encode( p_data : List ) : XML
 		{
-			var item : ListItem;
+			var item : GuiListItem;
 			var list : List;
 			
 			var raw : String = "<list id='" + p_data.id + "' allowOverride='" + p_data.allowOverride + "'>";

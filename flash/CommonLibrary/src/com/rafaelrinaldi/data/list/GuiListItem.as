@@ -10,7 +10,7 @@ package com.rafaelrinaldi.data.list
 	 * @author Rafael Rinaldi (rafaelrinaldi.com)
 	 * @since Jul 8, 2011
 	 */
-	public class ListItem implements IDisposable
+	public class GuiListItem implements IDisposable
 	{
 		/** Item id. **/
 		public var id : String;
@@ -22,7 +22,7 @@ package com.rafaelrinaldi.data.list
 		 * @param p_id Item id.
 		 * @param p_value Item value.
 		 */
-		public function ListItem( p_id : String, p_value : * = null )
+		public function GuiListItem( p_id : String, p_value : * = null )
 		{
 			id = p_id;
 			value = p_value;

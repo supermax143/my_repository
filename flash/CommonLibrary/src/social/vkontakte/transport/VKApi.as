@@ -197,6 +197,13 @@ public class VKApi
   
         sendRequest(params,resultHandler,faultHandler);
     }
+	public function isGroupMember(groupId:String, userId:String, resultHandler:Function = null, faultHandler:Function = null):void {
+		var params:Dictionary = new Dictionary(false);
+		params.gid = groupId;  
+		params.uid = userId;
+		
+		sendApiRequest("groups.isMember", params, resultHandler, faultHandler);
+	}
 	
 	//--------------------------------------------------------------------------
     //

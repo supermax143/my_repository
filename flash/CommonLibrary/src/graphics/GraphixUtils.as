@@ -268,5 +268,18 @@ package graphics {
 			return bitMap;
 		}
 		
+		public static function createHitArea(bitmapData:BitmapData, grainSize:uint=1):Sprite {
+			var _hitarea:Sprite = new Sprite();
+			_hitarea.graphics.beginFill(0x000000, 1.0);			
+			for(var x:uint=0;x<bitmapData.width;x+=grainSize) {
+				for(var y:uint=grainSize;y<bitmapData.height;y+=grainSize) {					
+					if(x<=bitmapData.width && y<=bitmapData.height && bitmapData.getPixel(x,y)!=0) {
+						_hitarea.graphics.drawRect(x,y,grainSize,grainSize);						
+					}					
+				}
+			}			
+			_hitarea.graphics.endFill();						
+			return _hitarea;
+		}
 	}
 }

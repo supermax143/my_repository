@@ -25,25 +25,25 @@ import graphics.Background;
 
 import resources.events.LoadingItemEvent;
 
-public class ResourceManagerImpl extends EventDispatcher implements IResourceManager {
+public class ResourceManagerDesctop extends EventDispatcher implements IResourceManager {
     private var _loader:BulkLoader;
     private var _queuedBunches:Array;
     private var _isLoading:Boolean = false;
     private var _currentLoadingBunch:LoaderBunch;
 
     private var _appDomain:ApplicationDomain;
-	private var _securityDomain:SecurityDomain;
+	//private var _securityDomain:SecurityDomain;
     private var _loaderContext:LoaderContext;
 	private var _soundLoaderContext:SoundLoaderContext;
     private var _bitmapDataCache:Dictionary;
 
 
-    public function ResourceManagerImpl() {
+    public function ResourceManagerDesctop() {
         _queuedBunches = []
 		_bitmapDataCache = new Dictionary(true);
         _appDomain = new ApplicationDomain(null);
-		_securityDomain = SecurityDomain.currentDomain;
-        _loaderContext = new LoaderContext(true, _appDomain,_securityDomain);
+		//_securityDomain = SecurityDomain.currentDomain;
+        _loaderContext = new LoaderContext(true, _appDomain);
 		_soundLoaderContext = new SoundLoaderContext(1000, true);
         _loader = new BulkLoader("main-loader");
         _loader.addEventListener(BulkLoader.COMPLETE, onBunchLoadedSuccessfully);
