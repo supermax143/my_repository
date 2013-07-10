@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<fxpProperties abbreviated="false" authoringTool="Flex Builder" compiles="true" parentProject="9a7b0efb-2c7e-449c-9254-4f088610a152" projectUUID="9a7b0efb-2c7e-449c-9254-4f088610a152" pureCatalystProject="false" sdkVersion="4.6.0" uuid="e0188b98-3369-450f-b840-bb8fd0006be6" version="15">
+  <projects>
+    <project filename="CommonLibrary.fxpl" position="2" projectUUID="5ef04642-ae91-4c96-9ffe-ddcd85acdc3e" uuid="e0188b98-3369-450f-b840-bb8fd0006be6"/>
+    <project filename="StarlingLibs.fxpl" position="3" projectUUID="1e59721c-b59e-4e42-a16d-1eaec6cb8809" uuid="e0188b98-3369-450f-b840-bb8fd0006be6"/>
+  </projects>
+  <src>
+    <linked isMain="false" location="libs" path="libs" position="0" uuid="e0188b98-3369-450f-b840-bb8fd0006be6"/>
+  </src>
+  <swc>
+    <linked location="sdkPlaceHolder" path="sdkPlaceHolder" position="0" uuid="e0188b98-3369-450f-b840-bb8fd0006be6"/>
+    <linked location="D:/work/my_repository/flash/DBProject/libs" path="/libs" position="1" uuid="e0188b98-3369-450f-b840-bb8fd0006be6"/>
+  </swc>
+  <misc/>
+  <theme/>
+  <mxmlFormattingPrefs groupAttributesByState="true" maxLineWidth="100" mxmlAlignAttributes="true" mxmlAttributeOrder="id,userLabel,includeIn,excludeFrom,visible,x,y,z,left,right,top,bottom,width,height,minWidth,minHeight,maxWidth,maxHeight,label" mxmlKeepAttributeValuesOrganized="true"/>
+</fxpProperties>

@@ -11,7 +11,6 @@ import flash.net.URLRequestHeader;
 import flash.net.URLRequestMethod;
 import flash.utils.ByteArray;
 
-import mx.controls.Alert;
 
 import social.vkontakte.loaders.MultipartData;
 import social.vkontakte.loaders.MultipartURLLoader;

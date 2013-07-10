@@ -42,7 +42,7 @@ package feathers.examples.trainTimes
 			}));
 
 			this._transitionManager = new OldFadeNewSlideTransitionManager(this._navigator);
-			this._transitionManager.duration = 0.4;
+			this._transitionManager.duration = 1;
 			this._navigator.showScreen(STATION_SCREEN);
 		}
 	}

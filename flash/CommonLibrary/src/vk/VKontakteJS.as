@@ -4,7 +4,6 @@
 	import flash.events.EventDispatcher;
 	import flash.external.ExternalInterface;
 	
-	import mx.controls.Alert;
 	
 	import vk.api.serialization.json.JSON;
 

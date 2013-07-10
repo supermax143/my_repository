@@ -107,7 +107,7 @@
 		<!-- <softKeyboardBehavior></softKeyboardBehavior> -->
 	 <aspectRatio>landscape</aspectRatio>
         <renderMode>direct</renderMode>
-		<autoOrients>false</autoOrients>
+		<autoOrients>true</autoOrients>
         <fullScreen>false</fullScreen>
         <visible>true</visible>
     </initialWindow>

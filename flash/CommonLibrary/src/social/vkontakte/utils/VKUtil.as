@@ -3,7 +3,6 @@ package social.vkontakte.utils
 	import flash.net.URLRequest;
 	import flash.net.navigateToURL;
 	
-	import mx.controls.Alert;
 	
 	import social.vkontakte.data.*;
 	import social.vkontakte.transport.*;

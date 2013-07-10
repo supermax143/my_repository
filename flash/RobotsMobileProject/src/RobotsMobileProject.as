@@ -39,8 +39,8 @@ package
 			// set general properties
 			if(!stage||stage.stage3Ds.length==0)
 				return;
-			var stageWidth:int  = 320;
-			var stageHeight:int = 480;
+			var stageWidth:int  = 960;
+			var stageHeight:int = 502;
 			var iOS:Boolean = Capabilities.manufacturer.indexOf("iOS") != -1;
 			
 			Starling.multitouchEnabled = true;  // useful on mobile devices
@@ -94,18 +94,18 @@ package
 			addChild(background);
 			*/
 			// launch Starling
-			mStarling = new Starling(Game, stage, viewPort);
+			mStarling = new Starling(Main, stage, viewPort);
 			mStarling.stage.stageWidth  = stageWidth;  // <- same size on all devices!
 			mStarling.stage.stageHeight = stageHeight; // <- same size on all devices!
 			mStarling.simulateMultitouch  = true;
 			mStarling.enableErrorChecking = false;
-			
+			mStarling.showStats = true;
 			mStarling.addEventListener(starling.events.Event.ROOT_CREATED, function():void
 			{
 				
-				var game:Game = mStarling.root as Game;
+				//var game:Game = mStarling.root as Game;
 				
-				game.start(assets);
+				//game.start(assets);
 				mStarling.start();
 			});
 			

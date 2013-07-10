@@ -17,15 +17,16 @@ package view.dollview
 			
 		}
 		
-		public static function addFactory(resource:ByteArray,factoryInitedHandler:Function):void
+		public static function addFactory(resourceClass:Class,factoryInitedHandler:Function):void
 		{
-			var factory:StarlingFactory = factoriesDictionary[resource]
+			var factory:StarlingFactory = factoriesDictionary[resourceClass]
+			var resource:ByteArray = new resourceClass();
 			if(!factory)
 			{
 				factory = new StarlingFactory();
-				//factory.scaleForTexture = 1;
+				factory.scaleForTexture = 1;
 				addInitFactory(factory);
-				factoriesDictionary[resource] = factory; 
+				factoriesDictionary[resourceClass] = factory; 
 				factory.addEventListener(Event.COMPLETE, function(event:Event):void
 				{
 					removeInitFactory(factory);

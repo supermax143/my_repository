@@ -6,8 +6,6 @@ package resources.loader
 	import flash.system.ApplicationDomain;
 	import flash.system.LoaderContext;
 	
-	import mx.controls.Alert;
-	
 
 	public class MainLoader
 	{
@@ -40,7 +38,7 @@ package resources.loader
 		{
 			if(_instance)
 			{
-				Alert.show("singletone");
+				trace("singletone");
 				return;
 			}	
 			loader = new BulkLoader('TMItemsLoader');
@@ -64,7 +62,7 @@ package resources.loader
 			var info:String = '';
 			info+="Total size:"+loader.bytesLoaded/1000+"\n";
 			info+="Files Count:"+loader._itemsTotal+"\n";
-			Alert.show(info)
+			trace(info)
 		}	
 		
 		public function removeItem():void

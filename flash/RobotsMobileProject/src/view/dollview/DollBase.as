@@ -12,7 +12,6 @@ package view.dollview
 	
 	import gameModel.RobotModel;
 	
-	
 	import resources.BunchLoadingItem;
 	import resources.ResourceManager;
 	
@@ -91,7 +90,7 @@ package view.dollview
 		private function onResoursesLoadingComplete():void {
 			//var resourceData:* = ResourceManager.instance.getBinary(type,false);
 			var resourceData:* = EmbeddedAssets.Robot_output;
-			FactoriesManager.addFactory(new resourceData(),factoryInited);
+			FactoriesManager.addFactory(EmbeddedAssets.Robot_output,factoryInited);
 		}
 		
 		private function onResoursesLoadingError(e:ErrorEvent):void {
@@ -291,14 +290,10 @@ package view.dollview
 		}
 		
 		
-		public function getAtacksList():Array
+		public function getAtacksList():Vector.<String>
 		{
-			var arr:Array = [];
-			if(!atackArmature)
-				return [];
-			for each (var atack:String in atackArmature.animation.movementList) 
-				arr.addItem(atack);
-			return arr;	
+			
+			return atackArmature.animation.movementList;	
 		}
 		
 		override public function dispose():void

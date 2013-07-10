@@ -13,7 +13,6 @@ import flash.net.URLVariables;
 import flash.utils.Dictionary;
 import flash.utils.Timer;
 
-import mx.controls.Alert;
 
 import social.utils.MD5;
 import social.vkontakte.data.*;
@@ -213,7 +212,7 @@ public class VKApi
 
 	private function sendRequest(params:Object,handler:Function,faltHandler:Function):void
 	{
-		Alert.show("Method not inited")
+		trace("Method not inited")
 	}
 	
 	private function sendApiRequest(method:String,params:Object,resultHandler:Function=null,faultHandler:Function=null):void
@@ -228,7 +227,7 @@ public class VKApi
    
 	private function defoltHandler(request:VKResponce):void
 	{
-		Alert.show(request.xmlData);
+		trace(request.xmlData);
 	}
 	
  	//--------------------------------------------------------------------------
