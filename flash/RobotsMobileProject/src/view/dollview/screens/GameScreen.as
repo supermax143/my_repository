@@ -1,17 +1,23 @@
 package view.dollview.screens
 {
+	import dragonBones.Bone;
 	import dragonBones.animation.WorldClock;
 	
 	import feathers.controls.Button;
 	import feathers.controls.Screen;
 	
+	import starling.core.Starling;
+	import starling.display.DisplayObject;
 	import starling.events.Event;
 	import starling.events.Touch;
 	import starling.events.TouchEvent;
 	import starling.events.TouchPhase;
+	import starling.extensions.PDParticleSystem;
+	import starling.textures.Texture;
 	
 	import view.dollview.DollBase;
 	import view.dollview.RobotDoll;
+	import view.dollview.RobotDollPartsManager;
 	import view.dollview.events.DollAnimationEvent;
 	import view.dollview.events.DollEvent;
 	
@@ -25,6 +31,7 @@ package view.dollview.screens
 		private var doll2:DollBase;
 		private var backButton:Button;
 		
+		public static var particleCoffee:PDParticleSystem;
 		
 		public function GameScreen()
 		{
@@ -36,7 +43,12 @@ package view.dollview.screens
 		override protected function initialize():void
 		{
 			super.initialize();
+			
+			
+			
+			
 			addEventListener(Event.ENTER_FRAME,onEnterFrame);
+			
 			doll1 = new RobotDoll(DollBase.ROBOT_TYPE);
 			if(!doll1.inited)
 			{
@@ -68,6 +80,9 @@ package view.dollview.screens
 			backButton.label = 'Back';
 			backButton.addEventListener(Event.TRIGGERED,backButtonClickHandler);
 			addChild(backButton);
+			particleCoffee = new PDParticleSystem(XML(new ParticleAssets.ParticleCoffeeXML()), Texture.fromBitmap(new ParticleAssets.StarParticleTexture()));
+			Starling.juggler.add(particleCoffee);
+			addChild(particleCoffee);
 		}
 		
 		override protected function draw():void
@@ -87,6 +102,11 @@ package view.dollview.screens
 		private function collideHandler(event:DollAnimationEvent):void
 		{
 			doll2.showAtackReactionAnimation(event.movementId,false);
+			var bone:Bone = doll2.getBone(RobotDollPartsManager.HEAD_BONE);
+			particleCoffee.emitterX = doll2.x+bone.origin.x;
+			particleCoffee.emitterY = doll2.y+bone.origin.y;
+			particleCoffee.emitAngle = 180;
+			particleCoffee.start(.3);
 		}
 		
 		

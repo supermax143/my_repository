@@ -23,29 +23,29 @@ package view.dollview
 	
 	import view.dollview.events.PartsManagerEvent;
 
-	internal class RobotDollPartsManager extends EventDispatcher
+	public class RobotDollPartsManager extends EventDispatcher
 	{
 		//--------------------------------------------------------------------------
 		//
 		//  Static properties
 		//
 		//--------------------------------------------------------------------------
-		private static const HEAD_BONE:String = 'golova';
-		private static const BODY_BONE:String = 'tors';
-		private static const PELVIS_BONE:String = 'taz';
+		public static const HEAD_BONE:String = 'golova';
+		public static const BODY_BONE:String = 'tors';
+		public static const PELVIS_BONE:String = 'taz';
 		
-		private static const LEFT_ARM_BONE:String = 'plecho 1';
-		private static const LEFT_HAND_BONE:String = 'predpl 1';
-		private static const RIGHT_ARM_BONE:String = 'plecho 2';
-		private static const RIGHT_HAND_BONE:String = 'predpl 2';
+		public static const LEFT_ARM_BONE:String = 'plecho 1';
+		public static const LEFT_HAND_BONE:String = 'predpl 1';
+		public static const RIGHT_ARM_BONE:String = 'plecho 2';
+		public static const RIGHT_HAND_BONE:String = 'predpl 2';
 		
-		private static const LEFT_THIGH_BONE:String = 'bedro 1';
-		private static const LEFT_FOOT_BONE:String = 'golen 1';
+		public static const LEFT_THIGH_BONE:String = 'bedro 1';
+		public static const LEFT_FOOT_BONE:String = 'golen 1';
 		
-		private static const RIGHT_THIGH_BONE:String = 'bedro 2';
-		private static const RIGHT_FOOT_BONE:String = 'golen 2';
+		public static const RIGHT_THIGH_BONE:String = 'bedro 2';
+		public static const RIGHT_FOOT_BONE:String = 'golen 2';
 		
-		private static const HEEL_BONE:String = 'stopa';
+		public static const HEEL_BONE:String = 'stopa';
 		
 		//--------------------------------------------------------------------------
 		//

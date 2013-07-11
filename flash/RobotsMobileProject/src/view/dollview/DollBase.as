@@ -1,6 +1,7 @@
 package view.dollview
 {
 	import dragonBones.Armature;
+	import dragonBones.Bone;
 	import dragonBones.animation.WorldClock;
 	import dragonBones.events.AnimationEvent;
 	import dragonBones.events.FrameEvent;
@@ -289,6 +290,11 @@ package view.dollview
 			//playAnimation(standArmature,'stand1',true);
 		}
 		
+		
+		public function getBone(boneName:String):Bone
+		{
+			return _currentArmature.getBone(boneName)
+		}
 		
 		public function getAtacksList():Vector.<String>
 		{

@@ -35,7 +35,7 @@ package
 			// referencing the "demo/src" directory as a "source path", or by copying the files.
 			// The "media" folder of this project has to be added to its "source paths" as well, 
 			// to make sure the icon and startup images are added to the compiled mobile app.
-			
+			stage.frameRate = 60;
 			// set general properties
 			if(!stage||stage.stage3Ds.length==0)
 				return;

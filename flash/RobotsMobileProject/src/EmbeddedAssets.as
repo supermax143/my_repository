@@ -15,7 +15,7 @@ package
         
         // Texture Atlas
         
-		[Embed(source = "/assets/Robot_output.png", mimeType = "application/octet-stream")]
+		[Embed(source = "../assets/robot_resource_mobile_output.swf", mimeType = "application/octet-stream")]
 		public static const Robot_output:Class;
        
     }
