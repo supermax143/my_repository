@@ -24,12 +24,15 @@ package
 		/**
 		 * Particle 
 		 */
-		[Embed(source="../assets/particles/hit_star_2.pex", mimeType="application/octet-stream")]
+		[Embed(source="../assets/particles/hit_particle.pex", mimeType="application/octet-stream")]
 		public static var ParticleCoffeeXML:Class;
 		
 		
 		
 		[Embed(source="../assets/particles/star_texture.png")]
 		public static var StarParticleTexture:Class;
+		
+		[Embed(source="../assets/particles/circle_texture.png")]
+		public static var CircleParticleTexture:Class;
 	}
 }

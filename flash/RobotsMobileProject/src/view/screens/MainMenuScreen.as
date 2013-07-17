@@ -1,4 +1,4 @@
-package view.dollview.screens
+package view.screens
 {
 	import com.renaun.controls.VGroup;
 	

@@ -18,8 +18,8 @@ package
 	
 	import starling.display.Sprite;
 	
-	import view.dollview.screens.GameScreen;
-	import view.dollview.screens.MainMenuScreen;
+	import view.screens.GameScreen;
+	import view.screens.MainMenuScreen;
 	
 	public class Main extends Sprite
 	{

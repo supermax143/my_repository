@@ -13,12 +13,12 @@ package view.dollview
 	
 	import gameModel.RobotModel;
 	
+	import org.osflash.signals.Signal;
+	
 	import resources.BunchLoadingItem;
-	import resources.ResourceManager;
 	
 	import starling.display.Sprite;
 	
-	import view.dollview.events.DollAnimationEvent;
 	import view.dollview.events.DollEvent;
 
 	public class DollBase extends Sprite
@@ -57,8 +57,16 @@ package view.dollview
 		//--------------------------------------------------------------------------
 		public var inited:Boolean = false;
 		public var type:String = '';
-		public var opponentType:String = '';
+		public var opponent:DollBase;
 		private var _animationSpeed:Number = 1;
+		//--------------------------------------------------------------------------
+		//
+		//  Signals
+		//
+		//--------------------------------------------------------------------------
+		public var animationCompleteSignal:Signal;
+		public var collisionSignal:Signal;
+		public var showParticleSignal:Signal;
 		//--------------------------------------------------------------------------
 		//
 		//  Constructor
@@ -69,6 +77,9 @@ package view.dollview
 			this.type = type;
 			var res:Array = [];
 			//addResource(res,RESOURCES_URL+type+"_output.swf",type,false,false,true);
+			animationCompleteSignal = new Signal(String,String);
+			collisionSignal = new Signal(DollBase,String)
+			showParticleSignal = new Signal(DollBase,String);	
 			onResoursesLoadingComplete();
 		}
 		
@@ -167,11 +178,14 @@ package view.dollview
 	
 		private function handleAnimationEvents(event:FrameEvent):void
 		{
-			switch(event.frameLabel)
+			if(event.frameLabel.indexOf('collision')!=-1)
 			{
-				case 'collision':
-					dispatchEvent(new DollAnimationEvent(DollAnimationEvent.COLLIDE,event.movementID));
-					break;
+				collisionSignal.dispatch(this,event.movementID);
+			}
+			else if(event.frameLabel.indexOf('particle')!=-1)
+			{
+				showParticleSignal.dispatch(this,event.movementID);
+				trace(event.frameLabel)
 			}
 		}
 		
@@ -190,8 +204,6 @@ package view.dollview
 		protected function initArmature(armatureName:String):Armature
 		{
 			var armature:Armature = factory.buildArmature(armatureName);
-			//for each(var anim:String in armature.animation.movementList)
-			//	playAnimation(armature,anim,false);
 			return armature;
 		}
 		
@@ -205,10 +217,14 @@ package view.dollview
 				WorldClock.clock.remove(_currentArmature);
 			
 			_currentArmature = value;
+			
 			if(!_currentArmature.hasEventListener(FrameEvent.MOVEMENT_FRAME_EVENT))
 				_currentArmature.addEventListener(FrameEvent.MOVEMENT_FRAME_EVENT,handleAnimationEvents)
+			
 			if(robot)
 				removeChild(robot);
+			
+			
 			robot = value.display as Sprite;
 			addChild(robot);
 			
@@ -229,7 +245,8 @@ package view.dollview
 			armature.removeEventListener(AnimationEvent.COMPLETE,animationCompleteHandler);
 			if(armature.name.indexOf('Death')==-1)
 				showStandAnimation();
-			dispatchEvent(new DollAnimationEvent(DollAnimationEvent.ANIMATION_COMPLETE,event.movementID))
+			//dispatchEvent(new DollAnimationEvent(DollAnimationEvent.ANIMATION_COMPLETE,event.movementID))
+			animationCompleteSignal.dispatch(armature.name,event.movementID);
 		}
 		
 		protected function playAnimation(armature:Armature,animationName:String,showStandAfterComplate:Boolean):void
@@ -258,9 +275,9 @@ package view.dollview
 		}
 
 		
-		public function setOpponent(type:String):void
+		public function setOpponent(opponent:DollBase):void
 		{
-			opponentType = type;
+			this.opponent = opponent;
 		}
 		
 		public function freeze():void

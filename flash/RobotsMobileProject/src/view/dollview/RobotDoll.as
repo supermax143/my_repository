@@ -38,17 +38,17 @@ package view.dollview
 			dispatchEvent(new DollEvent(DollEvent.INITED));
 		}
 		
-		override public function setOpponent(type:String):void
+		override public function setOpponent(opponent:DollBase):void
 		{
-			if(opponentType==type)
+			if(this.opponent==opponent)
 				return;
-			super.setOpponent(type);
+			super.setOpponent(opponent);
 			atackArmature = initArmature("Animations/Atack");
 			skillsArmarure = initArmature("Animations/Skills");
-			if(type.indexOf(DollBase.BOSS_TYPE)!=-1)
+			if(opponent.type.indexOf(DollBase.BOSS_TYPE)!=-1)
 			{
-				hitArmature = initArmature(type+"/Hit");
-				deathArmature = initArmature(type+"/Death");
+				hitArmature = initArmature(opponent.type+"/Hit");
+				deathArmature = initArmature(opponent.type+"/Death");
 			}
 			else
 			{

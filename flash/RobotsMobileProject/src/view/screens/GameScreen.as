@@ -1,4 +1,4 @@
-package view.dollview.screens
+package view.screens
 {
 	import dragonBones.Bone;
 	import dragonBones.animation.WorldClock;
@@ -7,7 +7,7 @@ package view.dollview.screens
 	import feathers.controls.Screen;
 	
 	import starling.core.Starling;
-	import starling.display.DisplayObject;
+	import starling.display.Sprite;
 	import starling.events.Event;
 	import starling.events.Touch;
 	import starling.events.TouchEvent;
@@ -18,8 +18,9 @@ package view.dollview.screens
 	import view.dollview.DollBase;
 	import view.dollview.RobotDoll;
 	import view.dollview.RobotDollPartsManager;
-	import view.dollview.events.DollAnimationEvent;
 	import view.dollview.events.DollEvent;
+	import view.particles.ParticleData;
+	import view.particles.ParticlesManager;
 	
 	public class GameScreen extends Screen
 	{
@@ -30,22 +31,25 @@ package view.dollview.screens
 		private var doll1:DollBase;
 		private var doll2:DollBase;
 		private var backButton:Button;
+		private var particlesManager:ParticlesManager;
 		
-		public static var particleCoffee:PDParticleSystem;
+		public static var hitParticle:PDParticleSystem;
+		
+		private var particlesLayer:Sprite;
 		
 		public function GameScreen()
 		{
 			super();
-			
-			
+			particlesManager = new ParticlesManager();
+			particlesManager.addParticleSignal.add(onParticleAdded)
+			particlesManager.removeParticleSignal.add(onParticleRemoved)
+			particlesLayer = new Sprite();
+			addChild(particlesLayer);
 		}
 		
 		override protected function initialize():void
 		{
 			super.initialize();
-			
-			
-			
 			
 			addEventListener(Event.ENTER_FRAME,onEnterFrame);
 			
@@ -59,7 +63,7 @@ package view.dollview.screens
 				doll1InitedHandler();
 			}
 			doll1.addEventListener(TouchEvent.TOUCH,onTouch)
-			doll1.addEventListener(DollAnimationEvent.COLLIDE,collideHandler)	
+			doll1.collisionSignal.add(onDollCollide)	
 			doll1.useHandCursor = true;	
 			
 			addChild(doll1);
@@ -73,6 +77,9 @@ package view.dollview.screens
 			{
 				doll2InitedHandler();
 			}
+			doll2.addEventListener(TouchEvent.TOUCH,onTouch)
+			doll2.collisionSignal.add(onDollCollide)	
+			doll2.useHandCursor = true;	
 			addChild(doll2);
 			backButtonHandler = onBackButton;
 			
@@ -80,46 +87,55 @@ package view.dollview.screens
 			backButton.label = 'Back';
 			backButton.addEventListener(Event.TRIGGERED,backButtonClickHandler);
 			addChild(backButton);
-			particleCoffee = new PDParticleSystem(XML(new ParticleAssets.ParticleCoffeeXML()), Texture.fromBitmap(new ParticleAssets.StarParticleTexture()));
-			Starling.juggler.add(particleCoffee);
-			addChild(particleCoffee);
+			hitParticle = new PDParticleSystem(XML(new ParticleAssets.ParticleCoffeeXML()), Texture.fromBitmap(new ParticleAssets.CircleParticleTexture()));
+			Starling.juggler.add(hitParticle);
+			addChild(hitParticle);
 		}
 		
 		override protected function draw():void
 		{
 			super.draw();
-			doll1.x = 250;
+			doll1.x = 300;
 			doll1.y = 470;
 			doll1.scaleX = -1;
 			
-			doll2.x = 620;
+			doll2.x = 670;
 			doll2.y = 470;
 		}
 		
 		
-		
-		
-		private function collideHandler(event:DollAnimationEvent):void
+		private function onDollCollide(target:DollBase,movementId:String):void
 		{
-			doll2.showAtackReactionAnimation(event.movementId,false);
-			var bone:Bone = doll2.getBone(RobotDollPartsManager.HEAD_BONE);
-			particleCoffee.emitterX = doll2.x+bone.origin.x;
-			particleCoffee.emitterY = doll2.y+bone.origin.y;
-			particleCoffee.emitAngle = 180;
-			particleCoffee.start(.3);
+			var hitTarget:DollBase = target.opponent;
+			hitTarget.showAtackReactionAnimation(movementId,false);
+			var bone:Bone = hitTarget.getBone(RobotDollPartsManager.HEAD_BONE);
+			hitParticle.emitterX = hitTarget.x+bone.origin.x;
+			hitParticle.emitterY = hitTarget.y+bone.origin.y;
+			hitParticle.maxNumParticles = 200;
+			hitParticle.emitAngle = hitTarget.scaleX>0?180:0;
+			hitParticle.start(.2);
 		}
 		
 		
 		private function doll1InitedHandler(event:DollEvent=null):void
 		{
-			doll1.setOpponent(DollBase.ROBOT_TYPE);
+			if(doll2.inited)
+				setOpponents();
+			
 		}
 		
 		private function doll2InitedHandler(event:DollEvent=null):void
 		{
-			doll2.setOpponent(DollBase.ROBOT_TYPE);
+			if(doll1.inited)
+				setOpponents();
+			
 		}
 		
+		private function setOpponents():void
+		{
+			doll1.setOpponent(doll2);
+			doll2.setOpponent(doll1);
+		}
 		
 		private function onTouch(event:TouchEvent):void
 		{
@@ -127,9 +143,8 @@ package view.dollview.screens
 			if(!touch)
 				return;
 			var actions:Vector.<String>  = doll1.getAtacksList();
-			//var actName:String = actions.getItemAt(Math.floor(Math.random()*actions.length)) as String;
-			var actName:String = actions[Math.floor(Math.random()*actions.length)];
-			doll1.showAtackAnimation(actName);
+			var actName:String = actions[Math.floor(Math.random()*(actions.length-1))+1];
+			(event.currentTarget as DollBase).showAtackAnimation(actName);
 		}
 		
 		private function onEnterFrame(e:Event):void
@@ -137,11 +152,20 @@ package view.dollview.screens
 			WorldClock.clock.advanceTime(-1);
 		}
 		
+		private function onParticleAdded(particleData:ParticleData):void
+		{
+			
+		}
+		
+		private function onParticleRemoved(particleData:ParticleData):void
+		{
+			
+		}
+		
 		
 		private function onBackButton():void
 		{
 			dispatchEvent(new Event(MAIN_MENU))
-			//this.dispatchEventWith(Event.COMPLETE);
 		}
 		
 		private function backButtonClickHandler(event:Event):void

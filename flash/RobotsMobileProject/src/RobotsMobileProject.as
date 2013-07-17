@@ -17,7 +17,7 @@ package
 	import starling.utils.RectangleUtil;
 	import starling.utils.ScaleMode;
 	
-	[SWF(width="960", height="502", frameRate="60", backgroundColor="#000000")]
+	[SWF(width="960", height="540", frameRate="60", backgroundColor="#000000")]
 	public class RobotsMobileProject extends Sprite
 	{
 		private var mStarling:Starling;
@@ -40,7 +40,7 @@ package
 			if(!stage||stage.stage3Ds.length==0)
 				return;
 			var stageWidth:int  = 960;
-			var stageHeight:int = 502;
+			var stageHeight:int = 540;
 			var iOS:Boolean = Capabilities.manufacturer.indexOf("iOS") != -1;
 			
 			Starling.multitouchEnabled = true;  // useful on mobile devices
@@ -99,7 +99,7 @@ package
 			mStarling.stage.stageHeight = stageHeight; // <- same size on all devices!
 			mStarling.simulateMultitouch  = true;
 			mStarling.enableErrorChecking = false;
-			mStarling.showStats = true;
+			//mStarling.showStats = true;
 			mStarling.addEventListener(starling.events.Event.ROOT_CREATED, function():void
 			{
 				
