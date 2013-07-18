@@ -56,7 +56,7 @@ package gameModel
 			dispatchUpdate();
 		}		
 
-		[Bindable]
+		
 		public function get damage():int {
 			return _damage;
 		}
@@ -120,7 +120,7 @@ package gameModel
 			dispatchUpdate();
 		}
 		
-		[Bindable]
+		
 		public function get level():int {
 			return _level;
 		}
@@ -139,7 +139,7 @@ package gameModel
 			dispatchUpdate();
 		}
 		
-		[Bindable]
+		
 		public function get hp():int {
 			return _hp;
 		}
@@ -148,7 +148,7 @@ package gameModel
 			_hp = value;
 			dispatchUpdate();
 		}
-		[Bindable]
+		
 		public function get strength():int {
 			return _strength;
 		}

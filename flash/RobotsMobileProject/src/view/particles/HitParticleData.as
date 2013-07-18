@@ -25,7 +25,7 @@ package view.particles
 		
 		private function create():void
 		{
-			var particle:PDParticleSystem = new PDParticleSystem(XML(new ParticleAssets.ParticleCoffeeXML()), Texture.fromBitmap(new ParticleAssets.CircleParticleTexture()));
+			var particle:PDParticleSystem = new PDParticleSystem(XML(new ParticleAssets.HitParticleXML()), Texture.fromBitmap(new ParticleAssets.CircleParticleTexture()));
 			var bone:Bone  
 				
 			switch(animationId)

@@ -103,19 +103,19 @@ package view.screens
 			hitTarget.showAtackReactionAnimation(animationId,false);
 			if(animationId == RobotDoll.MELEE_ANIMATION)
 			{
-				CameraManager.instance.shake(this,8);
+				CameraManager.instance.shake(this,2);
 			}
 			else if(animationId == RobotDoll.KICK_ANIMATION)
 			{
-				zoomOut();
-				TweenMax.delayedCall(2,function():void{zoomIn()})
+				zoomOut(hitTarget.scaleX<0?true:false);
+				TweenMax.delayedCall(1.4,function():void{zoomIn()})
 			}
 				
 		}
 		
-		private function zoomOut():void
+		private function zoomOut(mooveLeft:Boolean):void
 		{
-				CameraManager.instance.smoothScale(this,2,.7);
+				CameraManager.instance.smoothScale(this,1,.78,mooveLeft);
 			
 		}
 		
@@ -149,7 +149,8 @@ package view.screens
 			if(!touch)
 				return;
 			var actions:Vector.<String>  = doll1.getAtacksList();
-			var actName:String = actions[Math.floor(Math.random()*(actions.length-1))+1];
+			//var actName:String = actions[Math.floor(Math.random()*(actions.length-1))+1];
+			var actName:String = actions[3];
 			(event.currentTarget as DollBase).showAtackAnimation(actName);
 		}
 		

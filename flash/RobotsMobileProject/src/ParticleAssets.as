@@ -25,8 +25,9 @@ package
 		 * Particle 
 		 */
 		[Embed(source="../assets/particles/hit_particle.pex", mimeType="application/octet-stream")]
-		public static var ParticleCoffeeXML:Class;
-		
+		public static var HitParticleXML:Class;
+		[Embed(source="../assets/particles/smoke_particle.pex", mimeType="application/octet-stream")]
+		public static var SmokeParticleXML:Class;
 		
 		
 		[Embed(source="../assets/particles/star_texture.png")]

@@ -41,7 +41,7 @@ package view.particles
 			switch(particle)
 			{
 				case HIT_PARTICLE:
-					pData = new HitParticleData(target,animationId)
+					pData = new StuntParticleData(target,animationId)
 					break;
 				
 			}

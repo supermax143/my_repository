@@ -43,18 +43,20 @@ package utils
 			}
 			else
 			{
-				cameraShake -= .1;
+				cameraShake -= .03;
 				// Shake left right randomly.
-				target.x = int(Math.random() * cameraShake - cameraShake * 0.5); 
+				target.x = int(Math.random() * cameraShake - cameraShake  * (Math.random()>.5?1:-1)); 
 				// Shake up down randomly.
-				target.y = int(Math.random() * cameraShake - cameraShake * 0.5);
-				TweenMax.delayedCall(.01,function():void{shake(target,cameraShake)})
+				target.y = int(Math.random() * cameraShake - cameraShake  * (Math.random()>.5?1:-1));
+				TweenMax.delayedCall(.03,function():void{shake(target,cameraShake)})
 			}
 		}
-		public function smoothScale(target:DisplayObject,time:Number,scaleValue:Number,compleateHandler:Function=null):void
+		public function smoothScale(target:DisplayObject,time:Number,scaleValue:Number,moveLeft:Boolean=false,compleateHandler:Function=null):void
 		{
-			TweenMax.to(target,time,{scaleX:scaleValue,scaleY:scaleValue
-				,onComplete:function():void
+			var deltaX:Number = moveLeft?target.width - target.width*scaleValue:0;
+			var deltaY:Number = target.height - target.height*scaleValue;
+			TweenMax.to(target,time,{scaleX:scaleValue,scaleY:scaleValue,y:deltaY,x:deltaX,
+				onComplete:function():void
 				{
 					if(compleateHandler!=null)
 						compleateHandler();
