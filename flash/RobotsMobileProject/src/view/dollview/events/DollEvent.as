@@ -5,8 +5,8 @@ package view.dollview.events
 	public class DollEvent extends Event
 	{
 		
-		public static const INITED:String = 'inited';
-		public static const UPDATED:String = 'updated';
+		//public static const INITED:String = 'inited';
+		//public static const UPDATED:String = 'updated';
 		
 		
 		public function DollEvent(type:String,bubbles:Boolean=false, cancelable:Boolean=false)

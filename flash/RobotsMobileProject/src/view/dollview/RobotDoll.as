@@ -24,6 +24,12 @@ package view.dollview
 		
 		public var updated:Boolean = true;
 		
+		public static const PUNCH_ANIMATION:String = 'punch';
+		public static const KICK_ANIMATION:String = 'kick';
+		public static const MELEE_ANIMATION:String = 'melee';	
+		public static const PISTOL_ANIMATION:String = 'range_pistol';	
+		public static const RIFLE_ANIMATION:String = 'range_rifle';
+		
 		public function RobotDoll(type:String)
 		{
 			super(type);
@@ -35,7 +41,7 @@ package view.dollview
 			
 			standArmature = initArmature("Animations/Stand");
 			showStandAnimation();
-			dispatchEvent(new DollEvent(DollEvent.INITED));
+			dollInitedSignal.dispatch();
 		}
 		
 		override public function setOpponent(opponent:DollBase):void
@@ -121,7 +127,7 @@ package view.dollview
 			if(event)
 				event.target.removeEventListener(PartsManagerEvent.PARTS_UPDATED,partsManagerUpdatedHandler);
 			updated = true;
-			dispatchEvent(new DollEvent(DollEvent.UPDATED));
+			dollUpdatedSignal.dispatch();
 		}
 		
 		

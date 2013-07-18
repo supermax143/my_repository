@@ -23,13 +23,13 @@ package view.dollview
 			deathArmature = initArmature("Death");
 			standArmature = initArmature("Stand");
 			showStandAnimation();
-			dispatchEvent(new DollEvent(DollEvent.INITED));
+			dollInitedSignal.dispatch();
 		}
 		
 		override public function set model(value:RobotModel):void
 		{
 			super.model = value;
-			dispatchEvent(new DollEvent(DollEvent.UPDATED));
+			dollUpdatedSignal.dispatch();
 		}
 		
 		

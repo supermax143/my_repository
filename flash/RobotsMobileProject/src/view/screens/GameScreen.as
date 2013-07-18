@@ -1,5 +1,7 @@
 package view.screens
 {
+	import com.greensock.TweenMax;
+	
 	import dragonBones.Bone;
 	import dragonBones.animation.WorldClock;
 	
@@ -15,12 +17,12 @@ package view.screens
 	import starling.extensions.PDParticleSystem;
 	import starling.textures.Texture;
 	
+	import utils.CameraManager;
+	
 	import view.dollview.DollBase;
 	import view.dollview.RobotDoll;
 	import view.dollview.RobotDollPartsManager;
-	import view.dollview.events.DollEvent;
 	import view.particles.ParticleData;
-	import view.particles.ParticlesManager;
 	
 	public class GameScreen extends Screen
 	{
@@ -31,20 +33,14 @@ package view.screens
 		private var doll1:DollBase;
 		private var doll2:DollBase;
 		private var backButton:Button;
-		private var particlesManager:ParticlesManager;
 		
-		public static var hitParticle:PDParticleSystem;
 		
-		private var particlesLayer:Sprite;
+		private var frontParticlesLayer:Sprite;
 		
 		public function GameScreen()
 		{
 			super();
-			particlesManager = new ParticlesManager();
-			particlesManager.addParticleSignal.add(onParticleAdded)
-			particlesManager.removeParticleSignal.add(onParticleRemoved)
-			particlesLayer = new Sprite();
-			addChild(particlesLayer);
+			
 		}
 		
 		override protected function initialize():void
@@ -53,44 +49,21 @@ package view.screens
 			
 			addEventListener(Event.ENTER_FRAME,onEnterFrame);
 			
-			doll1 = new RobotDoll(DollBase.ROBOT_TYPE);
-			if(!doll1.inited)
-			{
-				doll1.addEventListener(DollEvent.INITED,doll1InitedHandler)
-			}
-			else
-			{
-				doll1InitedHandler();
-			}
-			doll1.addEventListener(TouchEvent.TOUCH,onTouch)
-			doll1.collisionSignal.add(onDollCollide)	
-			doll1.useHandCursor = true;	
+			doll1 = initDoll();
+			doll2 = initDoll();
 			
-			addChild(doll1);
 			
-			doll2 = new RobotDoll(DollBase.ROBOT_TYPE);
-			if(!doll2.inited)
-			{
-				doll2.addEventListener(DollEvent.INITED,doll2InitedHandler)
-			}
-			else
-			{
-				doll2InitedHandler();
-			}
-			doll2.addEventListener(TouchEvent.TOUCH,onTouch)
-			doll2.collisionSignal.add(onDollCollide)	
-			doll2.useHandCursor = true;	
-			addChild(doll2);
 			backButtonHandler = onBackButton;
 			
 			backButton = new Button();
 			backButton.label = 'Back';
 			backButton.addEventListener(Event.TRIGGERED,backButtonClickHandler);
 			addChild(backButton);
-			hitParticle = new PDParticleSystem(XML(new ParticleAssets.ParticleCoffeeXML()), Texture.fromBitmap(new ParticleAssets.CircleParticleTexture()));
-			Starling.juggler.add(hitParticle);
-			addChild(hitParticle);
+			
+			frontParticlesLayer = new Sprite();
+			addChild(frontParticlesLayer);
 		}
+		
 		
 		override protected function draw():void
 		{
@@ -103,38 +76,71 @@ package view.screens
 			doll2.y = 470;
 		}
 		
+		private function initDoll():DollBase
+		{
+			var doll:DollBase = new RobotDoll(DollBase.ROBOT_TYPE);
+			if(!doll.inited)
+			{
+				doll.dollInitedSignal.addOnce(dollInitedHandler);
+			}
+			else
+			{
+				dollInitedHandler();
+			}
+			doll.addEventListener(TouchEvent.TOUCH,onTouch)
+			doll.collisionSignal.add(onDollCollide)	
+			doll.showParticleSignal.add(onShowParticle)	
+			doll.useHandCursor = true;	
+			
+			addChild(doll);
+			return doll;
+		}
 		
-		private function onDollCollide(target:DollBase,movementId:String):void
+		
+		private function onDollCollide(target:DollBase,animationId:String):void
 		{
 			var hitTarget:DollBase = target.opponent;
-			hitTarget.showAtackReactionAnimation(movementId,false);
-			var bone:Bone = hitTarget.getBone(RobotDollPartsManager.HEAD_BONE);
-			hitParticle.emitterX = hitTarget.x+bone.origin.x;
-			hitParticle.emitterY = hitTarget.y+bone.origin.y;
-			hitParticle.maxNumParticles = 200;
-			hitParticle.emitAngle = hitTarget.scaleX>0?180:0;
-			hitParticle.start(.2);
+			hitTarget.showAtackReactionAnimation(animationId,false);
+			if(animationId == RobotDoll.MELEE_ANIMATION)
+			{
+				CameraManager.instance.shake(this,8);
+			}
+			else if(animationId == RobotDoll.KICK_ANIMATION)
+			{
+				zoomOut();
+				TweenMax.delayedCall(2,function():void{zoomIn()})
+			}
+				
 		}
 		
-		
-		private function doll1InitedHandler(event:DollEvent=null):void
+		private function zoomOut():void
 		{
-			if(doll2.inited)
-				setOpponents();
+				CameraManager.instance.smoothScale(this,2,.7);
 			
 		}
 		
-		private function doll2InitedHandler(event:DollEvent=null):void
+		private function zoomIn():void
 		{
-			if(doll1.inited)
-				setOpponents();
+			CameraManager.instance.smoothScale(this,1,1);
 			
 		}
 		
-		private function setOpponents():void
+		
+		private function onShowParticle(target:DollBase,particle:String,movementId:String):void
 		{
+			addParticle(ParticleData.init(target,particle,movementId))
+		}
+		
+		
+		
+		private function dollInitedHandler():void
+		{
+			if(!doll1||!doll1.inited||!doll2||!doll2.inited)
+				return;
+				
 			doll1.setOpponent(doll2);
 			doll2.setOpponent(doll1);
+			
 		}
 		
 		private function onTouch(event:TouchEvent):void
@@ -152,14 +158,24 @@ package view.screens
 			WorldClock.clock.advanceTime(-1);
 		}
 		
-		private function onParticleAdded(particleData:ParticleData):void
+		private function addParticle(particleData:ParticleData):void
 		{
-			
+			if(!particleData)
+				return;
+			particleData.removeSignal.addOnce(removeParticle);
+			for each(var particle:PDParticleSystem in particleData.frontParticles)
+			{
+				frontParticlesLayer.addChild(particle);
+			}
 		}
 		
-		private function onParticleRemoved(particleData:ParticleData):void
+		private function removeParticle(particleData:ParticleData):void
 		{
-			
+			for each(var particle:PDParticleSystem in particleData.frontParticles)
+			{
+				frontParticlesLayer.removeChild(particle);
+				//particle.dispose();
+			}
 		}
 		
 		
@@ -171,6 +187,23 @@ package view.screens
 		private function backButtonClickHandler(event:Event):void
 		{
 			onBackButton()
+		}
+		
+		
+		
+		override public function dispose():void
+		{
+			if(doll1)
+			{
+				doll1.removeEventListener(TouchEvent.TOUCH,onTouch)
+				doll1.collisionSignal.remove(onDollCollide)	
+			}
+			if(doll2)
+			{
+				doll2.removeEventListener(TouchEvent.TOUCH,onTouch)
+				doll2.collisionSignal.remove(onDollCollide)	
+			}
+			super.dispose();
 		}
 	}
 }

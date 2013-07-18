@@ -30,7 +30,9 @@ package view.dollview
 		//--------------------------------------------------------------------------
 		public static const ROBOT_TYPE:String = 'Robot'
 		public static const BOSS_TYPE:String = 'Boss'
-		public static const RESOURCES_URL:String = 'http://stcocos.com.xsph.ru/static_robots/swf/'	
+		public static const RESOURCES_URL:String = 'http://stcocos.com.xsph.ru/static_robots/swf/'
+			
+			
 		//--------------------------------------------------------------------------
 		//
 		//  Private properties
@@ -64,6 +66,8 @@ package view.dollview
 		//  Signals
 		//
 		//--------------------------------------------------------------------------
+		public var dollInitedSignal:Signal;
+		public var dollUpdatedSignal:Signal;
 		public var animationCompleteSignal:Signal;
 		public var collisionSignal:Signal;
 		public var showParticleSignal:Signal;
@@ -79,7 +83,9 @@ package view.dollview
 			//addResource(res,RESOURCES_URL+type+"_output.swf",type,false,false,true);
 			animationCompleteSignal = new Signal(String,String);
 			collisionSignal = new Signal(DollBase,String)
-			showParticleSignal = new Signal(DollBase,String);	
+			showParticleSignal = new Signal(DollBase,String,String);	
+			dollInitedSignal = new Signal();
+			dollUpdatedSignal = new Signal();
 			onResoursesLoadingComplete();
 		}
 		
@@ -126,10 +132,9 @@ package view.dollview
 			}
 			else
 			{
-				doll.addEventListener(DollEvent.INITED,
-					function inited(event:Event):void
+				doll.dollInitedSignal.addOnce(
+					function ():void
 					{
-						doll.removeEventListener(DollEvent.INITED,inited);
 						dollInited(doll,model,resultHandler);
 					})
 			}
@@ -144,10 +149,9 @@ package view.dollview
 			}
 			else
 			{
-				doll.addEventListener(DollEvent.INITED,
-					function inited(event:Event):void
+				doll.dollInitedSignal.addOnce(
+					function ():void
 					{
-						doll.removeEventListener(DollEvent.INITED,inited);
 						dollInited(doll,model,resultHandler);
 					})
 					
@@ -161,10 +165,10 @@ package view.dollview
 				resultHandler(doll);
 				return;
 			}
-			doll.addEventListener(DollEvent.UPDATED,
-				function robotUpdated(event:Event):void
+			
+			doll.dollUpdatedSignal.addOnce(
+				function():void
 				{
-					doll.removeEventListener(DollEvent.INITED,robotUpdated);
 					resultHandler(doll);
 				});
 			doll.model = model;
@@ -184,8 +188,8 @@ package view.dollview
 			}
 			else if(event.frameLabel.indexOf('particle')!=-1)
 			{
-				showParticleSignal.dispatch(this,event.movementID);
-				trace(event.frameLabel)
+				var particleName:String = event.frameLabel.split("_")[1];
+				showParticleSignal.dispatch(this,particleName,event.movementID);
 			}
 		}
 		
