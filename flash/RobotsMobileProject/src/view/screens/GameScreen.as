@@ -9,6 +9,7 @@ package view.screens
 	import feathers.controls.Screen;
 	
 	import starling.core.Starling;
+	import starling.display.Image;
 	import starling.display.Sprite;
 	import starling.events.Event;
 	import starling.events.Touch;
@@ -33,7 +34,7 @@ package view.screens
 		private var doll1:DollBase;
 		private var doll2:DollBase;
 		private var backButton:Button;
-		
+		private var background:Image;
 		
 		private var frontParticlesLayer:Sprite;
 		
@@ -47,10 +48,29 @@ package view.screens
 		{
 			super.initialize();
 			
+			background = new Image(EmbeddedAssets.getTexture("Arena1"));
+			addChild(background);
+			
 			addEventListener(Event.ENTER_FRAME,onEnterFrame);
 			
 			doll1 = initDoll();
+			if(!doll1.inited)
+			{
+				doll1.dollInitedSignal.addOnce(dollInitedHandler);
+			}
+			else
+			{
+				dollInitedHandler();
+			}
 			doll2 = initDoll();
+			if(!doll2.inited)
+			{
+				doll2.dollInitedSignal.addOnce(dollInitedHandler);
+			}
+			else
+			{
+				dollInitedHandler();
+			}
 			
 			
 			backButtonHandler = onBackButton;
@@ -74,19 +94,14 @@ package view.screens
 			
 			doll2.x = 670;
 			doll2.y = 470;
+			
+			background.y = actualHeight - background.height;
+			background.x = (actualWidth - background.width)/2
 		}
 		
 		private function initDoll():DollBase
 		{
 			var doll:DollBase = new RobotDoll(DollBase.ROBOT_TYPE);
-			if(!doll.inited)
-			{
-				doll.dollInitedSignal.addOnce(dollInitedHandler);
-			}
-			else
-			{
-				dollInitedHandler();
-			}
 			doll.addEventListener(TouchEvent.TOUCH,onTouch)
 			doll.collisionSignal.add(onDollCollide)	
 			doll.showParticleSignal.add(onShowParticle)	
@@ -149,8 +164,8 @@ package view.screens
 			if(!touch)
 				return;
 			var actions:Vector.<String>  = doll1.getAtacksList();
-			//var actName:String = actions[Math.floor(Math.random()*(actions.length-1))+1];
-			var actName:String = actions[3];
+			var actName:String = actions[Math.floor(Math.random()*(actions.length-1))+1];
+			//var actName:String = actions[5];
 			(event.currentTarget as DollBase).showAtackAnimation(actName);
 		}
 		

@@ -18,7 +18,8 @@ package view.particles
 	{
 		
 		public static const HIT_PARTICLE:String = "hit";
-		
+		public static const STUNT_PARTICLE:String = "stunt";
+		public static const FIRE_HIT_PARTICLE:String = "fireHit";
 		
 		protected var target:DollBase;
 		protected var animationId:String;
@@ -41,7 +42,13 @@ package view.particles
 			switch(particle)
 			{
 				case HIT_PARTICLE:
+					pData = new HitParticleData(target,animationId)
+					break;
+				case STUNT_PARTICLE:
 					pData = new StuntParticleData(target,animationId)
+					break;
+				case FIRE_HIT_PARTICLE:
+					pData = new FireHitParticleData(target,animationId)
 					break;
 				
 			}

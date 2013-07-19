@@ -17,7 +17,7 @@ package
 	import starling.utils.RectangleUtil;
 	import starling.utils.ScaleMode;
 	
-	[SWF(width="960", height="540", frameRate="60", backgroundColor="#000000")]
+	[SWF(width="960", height="540", frameRate="60", backgroundColor="#ffffff")]
 	public class RobotsMobileProject extends Sprite
 	{
 		private var mStarling:Starling;
