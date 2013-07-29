@@ -8,6 +8,7 @@ package view.screens
 	import feathers.controls.Button;
 	import feathers.controls.Screen;
 	
+	import starling.animation.DelayedCall;
 	import starling.core.Starling;
 	import starling.display.Image;
 	import starling.display.Sprite;
@@ -122,21 +123,21 @@ package view.screens
 			}
 			else if(animationId == RobotDoll.KICK_ANIMATION)
 			{
-				zoomOut(hitTarget.scaleX<0?true:false);
-				TweenMax.delayedCall(1.4,function():void{zoomIn()})
+				zoomOut(hitTarget.scaleX<0?CameraManager.SCALE_LEFT:CameraManager.SCALE_RIGHT,1,0.78);
+				TweenMax.delayedCall(1.4,function():void{zoomIn(1,1)})
 			}
 				
 		}
 		
-		private function zoomOut(mooveLeft:Boolean):void
+		private function zoomOut(direction:String,time:Number,scaleValue:Number):void
 		{
-				CameraManager.instance.smoothScale(this,1,.78,mooveLeft);
+				CameraManager.instance.smoothScale(this,time,scaleValue,direction);
 			
 		}
 		
-		private function zoomIn():void
+		private function zoomIn(time:Number,scaleValue:Number):void
 		{
-			CameraManager.instance.smoothScale(this,1,1);
+			CameraManager.instance.smoothScale(this,time,scaleValue);
 			
 		}
 		
@@ -165,7 +166,15 @@ package view.screens
 				return;
 			var actions:Vector.<String>  = doll1.getAtacksList();
 			var actName:String = actions[Math.floor(Math.random()*(actions.length-1))+1];
-			//var actName:String = actions[5];
+			//var actName:String = actions[3];
+			if(actName == RobotDoll.MELEE_ANIMATION)
+			{
+				TweenMax.delayedCall(.2,function():void
+				{
+					zoomOut(CameraManager.SCALE_CENTER,.5,0.78);
+					TweenMax.delayedCall(.5,function():void{zoomIn(.5,1)})
+				})
+			}
 			(event.currentTarget as DollBase).showAtackAnimation(actName);
 		}
 		

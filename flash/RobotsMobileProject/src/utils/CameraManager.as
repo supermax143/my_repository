@@ -13,6 +13,10 @@ package utils
 		//  Static properties
 		//
 		//--------------------------------------------------------------------------
+		public static const SCALE_LEFT:String = "scaleLeft";
+		public static const SCALE_RIGHT:String = "scaleRight";
+		public static const SCALE_CENTER:String = "scaleCenter";
+		
 		private static var  _instance:CameraManager;
 		public static function get instance():CameraManager
 		{
@@ -51,9 +55,21 @@ package utils
 				TweenMax.delayedCall(.03,function():void{shake(target,cameraShake)})
 			}
 		}
-		public function smoothScale(target:DisplayObject,time:Number,scaleValue:Number,moveLeft:Boolean=false,compleateHandler:Function=null):void
+		public function smoothScale(target:DisplayObject,time:Number,scaleValue:Number,scaleDerectory:String=SCALE_RIGHT,compleateHandler:Function=null):void
 		{
-			var deltaX:Number = moveLeft?target.width - target.width*scaleValue:0;
+			var deltaX:Number;
+			switch(scaleDerectory)
+			{
+				case SCALE_RIGHT: 
+					deltaX = 0;
+					break;
+				case SCALE_LEFT:
+					deltaX = target.width - target.width*scaleValue;
+					break;
+				case SCALE_CENTER:
+					deltaX = (target.width - target.width*scaleValue)/2;
+					break;
+			}
 			var deltaY:Number = target.height - target.height*scaleValue;
 			TweenMax.to(target,time,{scaleX:scaleValue,scaleY:scaleValue,y:deltaY,x:deltaX,
 				onComplete:function():void
