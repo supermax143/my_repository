@@ -10,6 +10,13 @@ package
 	import flash.geom.Rectangle;
 	import flash.system.Capabilities;
 	
+	import io.socket.flash.ISocketIOTransport;
+	import io.socket.flash.ISocketIOTransportFactory;
+	import io.socket.flash.SocketIOErrorEvent;
+	import io.socket.flash.SocketIOEvent;
+	import io.socket.flash.SocketIOTransportFactory;
+	import io.socket.flash.WebsocketTransport;
+	
 	import starling.core.Starling;
 	import starling.events.Event;
 	import starling.textures.Texture;
@@ -17,11 +24,10 @@ package
 	import starling.utils.RectangleUtil;
 	import starling.utils.ScaleMode;
 	
-	[SWF(width="960", height="540", frameRate="60", backgroundColor="#ffffff")]
+	[SWF(width="960", height="540", frameRate="60", backgroundColor="#000000")]
 	public class RobotsMobileProject extends Sprite
 	{
 		private var mStarling:Starling;
-		
 		
 		public function RobotsMobileProject()
 		{
@@ -117,9 +123,9 @@ package
 			
 			NativeApplication.nativeApplication.addEventListener(
 				flash.events.Event.DEACTIVATE, function (e:*):void { mStarling.stop(); });
+			
+			
 		}
-		
-		
 		
 	}
 }

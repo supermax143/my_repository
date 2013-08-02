@@ -30,7 +30,7 @@ package view.screens
 			gameButton = new Button();
 			gameButton.label = 'Play';
 			gameButton.addEventListener(Event.TRIGGERED,gameButtonClickHandler);	
-			buttonsGroup.addChild(gameButton);
+			buttonsGroup.addLayoutItem(gameButton)
 			addChild(buttonsGroup);
 		}
 		

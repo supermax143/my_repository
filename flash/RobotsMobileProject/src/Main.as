@@ -1,23 +1,15 @@
 package
 {
-	import com.renaun.controls.VGroup;
-	
-	import feathers.controls.Button;
-	import feathers.controls.ButtonGroup;
-	import feathers.controls.Panel;
 	import feathers.controls.ScreenNavigator;
 	import feathers.controls.ScreenNavigatorItem;
-	import feathers.controls.ScrollContainer;
-	import feathers.core.FeathersControl;
-	import feathers.layout.HorizontalLayout;
-	import feathers.layout.VerticalLayout;
+	import feathers.core.PopUpManager;
 	import feathers.motion.transitions.ScreenSlidingStackTransitionManager;
 	import feathers.themes.MetalWorksMobileTheme;
 	
-	import flash.geom.PerspectiveProjection;
-	
 	import starling.display.Sprite;
 	
+	import view.popup.LoginWindow;
+	import view.popup.WindowBase;
 	import view.screens.GameScreen;
 	import view.screens.MainMenuScreen;
 	
@@ -32,10 +24,11 @@ package
 		private var transitionManager:ScreenSlidingStackTransitionManager;
 		
 		
+		
+		
 		public function Main()
 		{
-			
-			theme = new MetalWorksMobileTheme(this.stage);
+			theme = new MetalWorksMobileTheme(this.stage,false);
 			screenNavigator = new ScreenNavigator();
 			screenNavigator.addScreen(MAIN_MENU, new ScreenNavigatorItem(MainMenuScreen,
 				{
@@ -49,6 +42,9 @@ package
 			addChild(screenNavigator);
 			transitionManager = new ScreenSlidingStackTransitionManager(screenNavigator);
 			transitionManager.duration = 0.4;
+			
+			WindowBase.show(LoginWindow);
+			
 		}
 	}
 }
